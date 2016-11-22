@@ -1,0 +1,416 @@
+/*******************************************************************************
+ *   Copyright (c) 2016, Omer Dogan.  All rights reserved.
+ *  
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *  
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *    
+ *******************************************************************************/
+package tr.com.olives4j.sql;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+
+import tr.com.olives4j.stree.StreeGroup;
+import tr.com.olives4j.stree.StreeIterator;
+import tr.com.olives4j.stree.StreeNode;
+import tr.com.olives4j.stree.StreeNodeMatcher;
+
+/**
+ * 
+ */
+public class SQLBindNode extends StreeNode implements SQLBind {
+	/****/
+	public String name;
+	/****/
+	private Object value;
+	/****/
+	private Object defaultValue;
+	/****/
+	private boolean optional;
+	/****/
+	private boolean inline;
+	/****/
+	private Integer jdbcType;
+
+	private String seperator = ",";
+
+	/**
+	 * 
+	 */
+	public SQLBindNode() {
+		super();
+	}
+
+	/**
+	 * 
+	 * @param var
+	 * @param vars
+	 */
+	public <T> SQLBindNode(T var, T... vars) {
+		value(var, vars);
+	}
+
+	/**
+	 * 
+	 * @param var
+	 * @param vars
+	 */
+	public <T> SQLBindNode(String name, T var, T... vars) {
+		name(name);
+		value(var, vars);
+	}
+
+	/**
+	 * 
+	 * @param name
+	 * @param it
+	 */
+	public <T> SQLBindNode(Iterable<T> it) {
+		value(it);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tr.com.olives4j.sql.SQLBind#name(java.lang.String)
+	 */
+	@Override
+	public SQLBindNode name(String name) {
+		this.name = name;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tr.com.olives4j.sql.SQLBind#jdbcType(java.lang.Integer)
+	 */
+	@Override
+	public SQLBind jdbcType(Integer type) {
+		this.jdbcType = type;
+		return this;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Integer jdbcType() {
+		return this.jdbcType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tr.com.olives4j.sql.SQLBind#jdbcType(java.lang.Integer)
+	 */
+	@Override
+	public SQLBind inline(boolean inline) {
+		this.inline = inline;
+		return this;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isInline() {
+		return this.inline;
+	}
+
+	/**
+	 * 
+	 * @param vars
+	 */
+	public <T> SQLBind value(T var, T... vars) {
+		if (vars.length == 0) {
+			this.value = var;
+			return this;
+		}
+
+		ArrayList<T> list = new ArrayList<T>(vars.length + 1);
+		list.add(var);
+		list.addAll(Arrays.asList(vars));
+		this.value = list;
+		return this;
+	}
+
+	/**
+	 * 
+	 * @param vars
+	 */
+	public SQLBind value(Iterable<?> vars) {
+		ArrayList<Object> list = new ArrayList<Object>();
+		Iterator<?> iterator = vars.iterator();
+		while (iterator.hasNext()) {
+			Object next = iterator.next();
+			list.add(next);
+		}
+
+		this.value = list;
+		return this;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Object value() {
+		if (optional) {
+			return defaultValue;
+		}
+
+		return value;
+	}
+
+	/**
+	 * 
+	 * @param param
+	 * @return
+	 */
+	public SQLBind defaultValue(Object param) {
+		this.defaultValue = param;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tr.com.olives4j.sql.SQLBind#optional()
+	 */
+	@Override
+	public SQLBindNode optional() {
+		this.optional = true;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tr.com.olives4j.sql.SQLBind#required()
+	 */
+	@Override
+	public SQLBindNode required() {
+		this.optional = false;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see tr.com.olives4j.sql.SQLBind#seperator(java.lang.String)
+	 */
+	@Override
+	public SQLBind seperator(String seperator) {
+		this.seperator = seperator;
+		return this;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Collection<Object> extract() {
+		return extract(new ArrayList<Object>());
+	}
+
+	/**
+	 * 
+	 */
+	public Collection<Object> extract(Collection<Object> c) {
+		Object targetValue = value();
+
+		if (targetValue == null) {
+			c.add(null);
+		} else if (targetValue.getClass().isArray()) {
+			c.addAll(Arrays.asList((Object[]) targetValue));
+		} else if (targetValue instanceof Collection) {
+			c.addAll((Collection<?>) targetValue);
+		} else {
+			c.add(targetValue);
+		}
+		return c;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	@Override
+	public SQLBindNode exclude(boolean exclude) {
+		super.exclude(exclude);
+		if (this.parent() != null && (!(this.parent() instanceof SQL) && this.parent() instanceof StreeGroup)) {
+			StreeIterator<SQLBindNode> walker = new StreeIterator<SQLBindNode>(parent(), StreeNodeMatcher.of(SQLBindNode.class, false));
+			if (!walker.hasNext()) {
+				this.parent().exclude(exclude);
+			}
+		} else {
+			StreeNode prev = null;
+			Iterator<StreeNode> nodes = ((StreeGroup) root()).iterator(null);
+			while (nodes.hasNext()) {
+				StreeNode next = nodes.next();
+				if (next == this && prev != null) {
+					prev.exclude(exclude);
+				}
+				prev = next;
+			}
+		}
+
+		return this;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public StreeNode process() {
+		if (this.optional && this.defaultValue == null) {
+			if (checkNull()) {
+				this.exclude(true);
+			}
+		}else if(this.exclude){
+			this.exclude(false);
+		}
+		return this;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean checkNull() {
+		if (value == null) {
+			return true;
+		} else if (value.getClass().isArray() && ((Object[]) value).length == 1 && ((Object[]) value)[0] == null) {
+			return true;
+		} else if (value instanceof Collection) {
+			return ((Collection<?>) value).size() > 0;
+		} else if (value instanceof Iterable) {
+			return ((Iterable<?>) value).iterator().hasNext();
+		}
+		return false;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public StreeNode merge(StringBuilder buffer) {
+		if (this.isExclude()) {
+			return this;
+		}
+
+		super.merge(buffer);
+
+		Object targetValue = value();
+
+		boolean isArray = targetValue != null && targetValue.getClass().isArray();
+		boolean isIterable = targetValue != null && targetValue instanceof Iterable;
+
+		if (buffer.length() == 0 || !Character.isWhitespace(buffer.charAt(buffer.length() - 1))) {
+			buffer.append(" ");
+		} 
+		
+		Iterable<?> ita = null;
+		if (isArray) {
+			ita = Arrays.asList((Object[]) targetValue);
+		} else if (isIterable) {
+			ita = (Iterable<?>) targetValue;
+		} else {
+			buffer.append("(?)");
+			return this;
+		}
+
+		Iterator<?> it = ita.iterator();
+		
+		buffer.append("(");
+		if (!it.hasNext()) {
+			buffer.append("null").append(seperator);
+		} else {
+			while (it.hasNext()) {
+				Object next = it.next();
+				buffer.append("?").append(seperator);
+			}
+		}
+		buffer.setLength(buffer.length() - 1);
+		buffer.append(")");
+
+		return this;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public boolean isExcluded() {
+		return exclude;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public boolean isOptional() {
+		return optional;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public Object getDefaultValue() {
+		return defaultValue;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public StreeNode clone() {
+		return new SQLBindNode(name, value);
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		String val = null;
+		if (value == null) {
+			val = "null";
+		} else {
+			boolean isArray = value.getClass().isArray();
+			if (isArray && ((Object[]) value).length == 0) {
+				val = "null";
+			} else if (value.getClass().isArray() && ((Object[]) value)[0] == null) {
+				val = "null";
+			} else if (value.getClass().isArray()) {
+				val = Arrays.asList((Object[]) value).toString();
+			} else {
+				val = Arrays.asList(value).toString();
+			}
+
+		}
+		return "SQLBind [name=" + name + ", value=" + val + ", default:" + defaultValue + ", optional=" + optional + ", exlude=" + exclude + "]";
+	}
+
+}
