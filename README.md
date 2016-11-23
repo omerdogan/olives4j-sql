@@ -12,12 +12,13 @@ Sample code demonstrate using olives4j-sql api
 	
 	// create sql object for the query
 	SQL sql = SQL.of("select * from customer where 1=1", //
-			" and store_id 	=:store_id", //
-			" and first_name like 	  ", $("a%"), //
-			" and active    		= ", $(true), //
+			" and store_id 	= :store_id", //
+			" and active 	= :active" , //
+			" and first_name like ", $("a%"), //
 			" and create_date between", $(startDate),"and",$(endDate));
 	
 	sql.bindings().bind("store_id", null).optional();
+	sql.bindings().bind("active", null).optional().defaultValue(true);
 	
 	System.out.println("SQL			:\n"+sql.toString());
 	System.out.println("SQL DEBUG	:\n"+sql.format());
@@ -40,30 +41,31 @@ This code is produce the following output;
 	and(? /* Thu Feb 16 00:00:00 EET 2006*/?)
 ```
 
-As you may realize the following line removed from final query. The reason is store_id parameter defined as optional and provided value is null.
+As you may realize the following line removed from final query. 
+The reason is store_id parameter is defined as optional and provided value is null.
    
 		and store_id   = :store_id
 
 Observations from the sample code;
 
 * We use SQL type to build an sql statement instead of StringBuilder/StringBuffer  
-* SQL type accepts varargs parameters for its builder methods which accepts string,tree node types an any object    
+* SQL type accepts varargs parameters with the type of string,tree nodes, and any other object    
 * SQL type support named binding variables 
-* Binding variables may be defined as optional
-* SQL expressions including optional bindings removed from the final query if the binding values are null 
-* SQL #format() produce sql string which is indented and binding parameter values placed relatively. It make sql debugging much easier
+* Binding variables may be defined as optional and a default value can be provided.
+* SQL expressions including optional bindings removed from the final query if the provided values are null 
+* SQL #format() produce formatted sql string which also includes binding parameter values placed relatively near to placeholders. It make sql debugging much easier
 
 
 ###Overview
 
-#### WHAT 
+Olives4j-sql includes ;
+
 * SQLReader; Sql script parser to parsing any sql/plsql script context into collection of SQL instances. 
 * STree Api; A data structure to build and modify structural strings dynamicly as an alternative to StringBuilder 
 * SQL Api  ; An extension to Stree data structure to add sql support 
 * Some utilities which handle with sql strings    
 
-#### WHAT is not
-It is not provide any abstraction or functionality for database access, deal only with sql and binding.
+- It is not provide any abstraction or functionality for database access, deal only with sql and binding.
 
 Usage
 -----
@@ -264,34 +266,38 @@ TBC
 	List list = query.list();
 ```
 
-SQL Annotation
+External SQL and SQL Annotation
 -----
 
 Olives4j-sql is intended to be able to parse any ordinary sql/plsql script file.
-it use an extension concept, SQL annotation, to add extra behaviour to sql scripts to entegrate with code easier
+it use an extension concept, SQL annotation, which allow adding extra behaviour to sql scripts to integrate sql with code easier
 The SQL annotation is like javadoc annotations
 
 - SQL annotations may be defined in line or block comments 
 - SQL comments must be started with @ sign to be annotation and started with @: binding annotation  
 		
-	--@<annotation_name> <annotation parameters> 
-    /*@<annotation_name> <annotation parameters>
+	--@[annotation_name] [annotation parameters] 
+	/*@[annotation_name] [annotation parameters]
 
-SQL api provides #getAnnotations() method to inquire the annotations
-The following annotations is supported by default and processed by the SQLReader
+	--@:[binding_parameter_name] [binding parameters] 
+	/*@:[binding_parameter_name] [binding parameters]
+    
+There are some special annotations provided by default with the olives4j-sql. 
 
 - @NAMED <NAME> used to name sql queries.
 	SQLReader create SQL with the name defined in @NAMED annotation.    
 - @:<bindingParameterName> used to define bindings. 
 	SQLReader create SQL with these bindings and properties      
 
+SQL api provides #getAnnotations() method to inquire the annotations.
+
 
 Motivation
 ---------------
 
-Although there are huge number of jdbc related libraries, most of them focus only abstraction of jdbc api and not provide much help for building sql dynamicly.
+Although there are huge number of jdbc related libraries, most of them focus only abstraction of jdbc api and not provide much help for building sql dynamicly. 
 
-Lets take a scenerio for a change on an ordinary database project for searching
+Lets take a scenerio for a sql related change on an ordinary database project
 
 * Open a sql ide
 * Create/Update the sql query with some inline parameters
@@ -307,7 +313,7 @@ Lets take a scenerio for a change on an ordinary database project for searching
     ```
 	
 * Execute the query and test if it is correct
-* Define the binding parameters and convert inline parameter values to binding
+* Define the binding parameters and convert inline parameters to bindings
 
  ```sql
 	select * 
@@ -319,13 +325,14 @@ Lets take a scenerio for a change on an ordinary database project for searching
 	and create_date between :create_date_from and :create_date_to
 ```
      
-* Convert the sql to target java api, mostly it will be a string otherwise will be a dsl api
+* Convert the sql to target java api, mostly it will be a concataneted string otherwise will be a dsl api
 	
 	[See the comparison for sample ](#compareHibernate)
 	
 
 Olives4j-sql aims to change the scenerio as below
 
+* Keep the sql scripts on sql script files as an application resource
 * Open the target sql script in a sql ide
 * Create/Update the sql query with bindings and annotations
 	
@@ -350,9 +357,13 @@ Olives4j-sql aims to change the scenerio as below
 Status
 ---------------
 	
-	Although this library is functinally complete, it is not ready for production yet.	
-	it needs more testing and some feedback. You can use it for non production and test codes and give some feedback
-	 
+Although this library is functinally complete, it is not ready for production yet.	
+it needs more testing and feedback. You can use it for non production and test codes.
+ 
+Download
+---------------
+
+TBC
 
 License
 ---------------

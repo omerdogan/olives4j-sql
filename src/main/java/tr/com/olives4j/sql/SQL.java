@@ -51,10 +51,10 @@ public class SQL extends Stree {
 	private static final StreeNodeMatcher<SQLBindNode> BINDS = new StreeNodeMatcher<SQLBindNode>(SQLBindNode.class, false);
 	/** **/
 	private static final AtomicInteger instanceCounter = new AtomicInteger();
-	
+
 	/** */
 	public static final Options DEFAULT_OPTIONS = new Options();
-	
+
 	/**
 	 * 
 	 */
@@ -69,16 +69,14 @@ public class SQL extends Stree {
 	 * Construct empty sql
 	 */
 	public SQL() {
-		this("SQL-" + instanceCounter.incrementAndGet());
-		this.options=(Options) DEFAULT_OPTIONS.clone();
+		this("SQL-" + instanceCounter.incrementAndGet(), DEFAULT_OPTIONS.clone());
 	}
 
 	/**
 	 * Construct empty sql
 	 */
 	public SQL(Options options) {
-		this("SQL-" + instanceCounter.incrementAndGet());
-		this.options = options;
+		this("SQL-" + instanceCounter.incrementAndGet(),DEFAULT_OPTIONS.clone());
 	}
 
 	/**
@@ -88,6 +86,18 @@ public class SQL extends Stree {
 	 */
 	public SQL(String name) {
 		super(name);
+		this.bindings = new SQLBindings(this);
+		this.options = (Options) DEFAULT_OPTIONS.clone();
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 *            name of this instance
+	 */
+	public SQL(String name,Options options) {
+		super(name);
+		this.options = options;
 		this.bindings = new SQLBindings(this);
 	}
 
@@ -114,10 +124,10 @@ public class SQL extends Stree {
 	 */
 	public SQL clone() {
 		SQL sql = (SQL) new SQL(this.options).name(name);
-		for(int i=0;i<this.nodes.size();i++){
+		for (int i = 0; i < this.nodes.size(); i++) {
 			sql.append(this.nodes.get(i).clone());
 		}
-		
+
 		return sql;
 	}
 
@@ -260,16 +270,18 @@ public class SQL extends Stree {
 
 	// Sub classes /////////////////////////////////////////
 
-	static class Options implements Cloneable{
+	static class Options implements Cloneable {
 		boolean keepFormat = false;
 		SQLFormatter formatter = SQLFormatter.INSTANCE;
+
 		public Options() {
 			super();
 		}
+
 		@Override
-		protected Object clone()  {
+		protected Options clone() {
 			try {
-				return super.clone();
+				return (Options)super.clone();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

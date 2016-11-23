@@ -10,7 +10,7 @@
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 
-archivesBaseName = "olive-sql"
+archivesBaseName = "olives4j-sql"
 version = '0.5'
 
 sourceCompatibility = 1.6

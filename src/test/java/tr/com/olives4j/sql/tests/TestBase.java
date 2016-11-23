@@ -18,6 +18,11 @@ package tr.com.olives4j.sql.tests;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,21 +61,24 @@ public class TestBase {
 
 	public void debugQuery(SQL sql, int num) {
 		StringBuilder buffer = new StringBuilder();
-		buffer.append(num + ".1 query		: " + sql.toString());
-		buffer.append("\n" + num + ".2 formatted	: " + sql.format());
-		buffer.append("\n" + num + ".3 Bindings	: " + lines(sql.bindings()));
+		buffer.append("\n\n" + num + ".1 query :\n" + sql.toString());
+		buffer.append("\n\n" + num + ".2 formatted :\n" + sql.format());
+		buffer.append("\n\n" + num + ".3 Bindings	:\n" + lines(sql.bindings()));
 		logger.debug(buffer);
 	}
 
-	public void checkBind(SQL sql, int bindIndex, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue, Object value) {
+	public void checkBind(SQL sql, int bindIndex, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue,
+			Object value) {
 		checkBind(sql, sql.bindings().get(bindIndex), numOfValues, optional, excluded, excludedClauseIndex, defaultValue, value);
 	}
 
-	public void checkBind(SQL sql, String bindName, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue, Object value) {
+	public void checkBind(SQL sql, String bindName, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue,
+			Object value) {
 		checkBind(sql, sql.bindings().get(bindName), numOfValues, optional, excluded, excludedClauseIndex, defaultValue, value);
 	}
 
-	public void checkBind(SQL sql, SQLBind bind, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue, Object value) {
+	public void checkBind(SQL sql, SQLBind bind, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue,
+			Object value) {
 		sql.process();
 		Assert.assertEquals(bind.extract().size(), numOfValues);
 		Assert.assertEquals(bind.isOptional(), optional);
@@ -257,4 +265,21 @@ public class TestBase {
 		return fields;
 	}
 
+	public Connection getConnection() throws SQLException {
+		String url = "jdbc:h2:tcp://localhost/sakila";
+		String username = "sa";
+		String password = "";
+		Connection connection = DriverManager.getConnection(url, username, password);
+		return connection;
+	}
+
+	protected void execute(SQL sql) throws SQLException {
+		Connection conn=getConnection();
+		PreparedStatement pstmt = conn.prepareStatement(sql.toString());
+		sql.bindings().apply(pstmt);
+		ResultSet rs = pstmt.executeQuery();
+		while(rs.next()){
+			System.out.println(rs.getString(1));
+		}
+	}
 }

@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.ConsoleAppender;
@@ -253,8 +252,6 @@ public class SQLBuilderTests extends TestBase {
 				"and rental_date +INTERVAL film.rental_duration DAY< SYSDATE()");
 		// @formatter:on
 
-		String query = sql.toString();
-
 		int i = 0;
 		Iterator<StreeNode> nodes = sql.getNodes().iterator();
 		while (nodes.hasNext()) {
@@ -263,7 +260,7 @@ public class SQLBuilderTests extends TestBase {
 		}
 
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("1.1 query         	: " + query);
+		buffer.append("1.1 query         	: " + sql.toString());
 		buffer.append("\n1.2 formatted     	: " + sql.format());
 		buffer.append("\n1.3 Bindings      	: " + lines(sql.bindings()));
 		buffer.append("\nCustomer Mark  	:" + markCustomer);
@@ -290,14 +287,12 @@ public class SQLBuilderTests extends TestBase {
 	@Test
 	public void unionTest() {
 		SQL sql = new SQL();
-		sql = new SQL();
-		sql.append("select * from x  where 1=1 AND x=?", $(9), "\n");
-		sql.append(" union ").append(sql);
-		sql.append(" AND 1=? ", $(3));
+		sql.append("select * from customer  where 1=1 AND active=false and customer_id=", $(9), "\n");
+		SQL clone1 = sql.clone();
+		sql.append(" union \n").append(clone1);
+		sql.append(" AND active= ", $(true));
 
-		CharSequence string = sql.format();
-		logger.debug(string);
-		logger.debug(lines(sql.bindings().iterator()));
+		debugQuery(sql, 1);
 	}
 
 	/**
