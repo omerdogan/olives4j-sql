@@ -58,6 +58,72 @@ Observations from the sample code;
 
 ###Overview
 
+Although SQL is a very powerfull dsl   
+
+> Sometimes it seems like programmers will do everything to avoid SQL. 
+> At the same time DSLs (Domain Specific Languages) are very popular. 
+> If DSLs are so great, why are you trying to avoid SQL? 
+> Or procedural extensions to SQL? SQL is a DSL for dealing with relational data." \[1\]
+
+\[1\]:[http://www.andrejkoelewijn.com/blog/2008/10/27/sql-is-a-dsl/](http://www.andrejkoelewijn.com/blog/2008/10/27/sql-is-a-dsl/)
+
+The main objectives of this project is try to remove the handicaps of using sql in java.
+
+Lets look how we try to solve these handicaps in olives4j-sql
+
+#####1. Embedding sql syntax into java is too cumbersome and error-prone.
+
+So What we can do currently
+   
+1. Accept the fortune and use it this way
+
+	String query = "select COF_NAME, SUP_ID, PRICE, " +
+                   "SALES, TOTAL " +
+                   "from " + dbName + ".COFFEES";
+                   
+	Don't be so pessimist :) try another option
+	
+2. Use some fancy sql builder library
+
+	select("COF_NAME", "SUP_ID","PRICE"..)
+	.from("SALES, TOTAL")
+	.where("COF_NAME=? AND SUP_ID=?", 1, 2)
+	.groupBy("COF_NAME")
+	.orderBy("COF_NAME");
+   
+  It seems better, but  
+  - On a change,you have to convert this code to sql form, update and test the query on an externel sql client, then convert the query back to this form.
+  - It still error-prone , you can't be sure the code is valid until it run
+  - You could not map all type sqls because of the limitation of api
+
+3. Use an Hibernate/JPA Criteria api
+
+  - On a change,you have to convert this code to sql form, update and test the query on an externel sql client, then convert the query back to this form.
+  - It still error-prone , you can't be sure the code is valid until it run
+  - You could not map all type sqls because of the limitation of api 
+  
+4. Use an embedded sql DSL like JOOQ,QUERYDSL  
+  
+	 create.select(AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME, count())
+	      .from(AUTHOR)
+	      .join(BOOK).on(AUTHOR.ID.equal(BOOK.AUTHOR_ID))
+	      .where(BOOK.LANGUAGE.eq("DE"))
+	      .and(BOOK.PUBLISHED.gt(date("2008-01-01")))
+	      .groupBy(AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME)
+	      .having(count().gt(5))
+	      .orderBy(AUTHOR.LAST_NAME.asc().nullsFirst())
+	      .limit(2)
+	      .offset(1)
+ 
+ It seems awesome or does it...
+  - On a change,you have to convert this code to sql form, update and test the query on an externel sql client, then convert the query back to this form.
+ - It still error-prone , you can't be sure the code is valid until it run. 
+ - There is support only specific databases 
+
+
+
+
+
 Olives4j-sql includes ;
 
 * SQLReader; Sql script parser to parsing any sql/plsql script context into collection of SQL instances. 
