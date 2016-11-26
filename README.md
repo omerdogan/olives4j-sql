@@ -58,7 +58,7 @@ Observations from the sample code;
 
 ###Overview
 
-Although SQL is a very powerfull dsl   
+JDBC is very powerful and flexible java api, Meanwhile it is very verbose   
 
 > Sometimes it seems like programmers will do everything to avoid SQL. 
 > At the same time DSLs (Domain Specific Languages) are very popular. 
@@ -75,15 +75,15 @@ Lets look how we try to solve these handicaps in olives4j-sql
 
 So What we can do currently
    
-1. Accept the fortune and use it this way
+1. Go with bare jdbc
 
 	String query = "select COF_NAME, SUP_ID, PRICE, " +
                    "SALES, TOTAL " +
                    "from " + dbName + ".COFFEES";
-                   
-	Don't be so pessimist :) try another option
 	
-2. Use some fancy sql builder library
+	Please dont do this;                   
+	
+2. Use one of sql builder library
 
 	select("COF_NAME", "SUP_ID","PRICE"..)
 	.from("SALES, TOTAL")
