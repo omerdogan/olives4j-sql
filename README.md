@@ -56,83 +56,6 @@ Observations from the sample code;
 * SQL #format() produce formatted sql string which also includes binding parameter values placed relatively near to placeholders. It make sql debugging much easier
 
 
-###Overview
-
-JDBC is very powerful and flexible java api, Meanwhile it is very verbose   
-
-> Sometimes it seems like programmers will do everything to avoid SQL. 
-> At the same time DSLs (Domain Specific Languages) are very popular. 
-> If DSLs are so great, why are you trying to avoid SQL? 
-> Or procedural extensions to SQL? SQL is a DSL for dealing with relational data." \[1\]
-
-\[1\]:[http://www.andrejkoelewijn.com/blog/2008/10/27/sql-is-a-dsl/](http://www.andrejkoelewijn.com/blog/2008/10/27/sql-is-a-dsl/)
-
-The main objectives of this project is try to remove the handicaps of using sql in java.
-
-Lets look how we try to solve these handicaps in olives4j-sql
-
-#####1. Embedding sql syntax into java is too cumbersome and error-prone.
-
-So What we can do currently
-   
-1. Go with bare jdbc
-
-	String query = "select COF_NAME, SUP_ID, PRICE, " +
-                   "SALES, TOTAL " +
-                   "from " + dbName + ".COFFEES";
-	
-	Please dont do this;                   
-	
-2. Use one of sql builder library
-
-	select("COF_NAME", "SUP_ID","PRICE"..)
-	.from("SALES, TOTAL")
-	.where("COF_NAME=? AND SUP_ID=?", 1, 2)
-	.groupBy("COF_NAME")
-	.orderBy("COF_NAME");
-   
-  It seems better, but  
-  - On a change,you have to convert this code to sql form, update and test the query on an externel sql client, then convert the query back to this form.
-  - It still error-prone , you can't be sure the code is valid until it run
-  - You could not map all type sqls because of the limitation of api
-
-3. Use an Hibernate/JPA Criteria api
-
-  - On a change,you have to convert this code to sql form, update and test the query on an externel sql client, then convert the query back to this form.
-  - It still error-prone , you can't be sure the code is valid until it run
-  - You could not map all type sqls because of the limitation of api 
-  
-4. Use an embedded sql DSL like JOOQ,QUERYDSL  
-  
-	 create.select(AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME, count())
-	      .from(AUTHOR)
-	      .join(BOOK).on(AUTHOR.ID.equal(BOOK.AUTHOR_ID))
-	      .where(BOOK.LANGUAGE.eq("DE"))
-	      .and(BOOK.PUBLISHED.gt(date("2008-01-01")))
-	      .groupBy(AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME)
-	      .having(count().gt(5))
-	      .orderBy(AUTHOR.LAST_NAME.asc().nullsFirst())
-	      .limit(2)
-	      .offset(1)
- 
- It seems awesome or does it...
-  - On a change,you have to convert this code to sql form, update and test the query on an externel sql client, then convert the query back to this form.
- - It still error-prone , you can't be sure the code is valid until it run. 
- - There is support only specific databases 
-
-
-
-
-
-Olives4j-sql includes ;
-
-* SQLReader; Sql script parser to parsing any sql/plsql script context into collection of SQL instances. 
-* STree Api; A data structure to build and modify structural strings dynamicly as an alternative to StringBuilder 
-* SQL Api  ; An extension to Stree data structure to add sql support 
-* Some utilities which handle with sql strings    
-
-- It is not provide any abstraction or functionality for database access, deal only with sql and binding.
-
 Usage
 -----
 
@@ -208,6 +131,117 @@ There are three technique you can use to create dynamic queries with olives4j-sq
 	sql.bindings().bind("start_date"	, sdf.parse("2006-02-14"));
 	sql.bindings().bind("end_date"	, sdf.parse("2006-02-16"));	
 ```
+
+
+###Overview
+
+JDBC is very powerful and flexible api, But it is also very low level and verbose.   
+
+> Sometimes it seems like programmers will do everything to avoid SQL. 
+> At the same time DSLs (Domain Specific Languages) are very popular. 
+> If DSLs are so great, why are you trying to avoid SQL? 
+> Or procedural extensions to SQL? SQL is a DSL for dealing with relational data." [[1]](http://www.andrejkoelewijn.com/blog/2008/10/27/sql-is-a-dsl/)
+
+
+The main objectives of this project is try to remove the following handicaps of using sql with java.
+
+#####1. Embedding sql syntax into java is too cumbersome and error-prone.
+
+So What we can do currently
+   
+######1.1 Go with bare jdbc
+
+```java
+
+	String query = "select COF_NAME, SUP_ID, PRICE, " +
+                   "SALES, TOTAL " +
+                   "from " + dbName + ".COFFEES";	
+	
+```
+	
+######1.2 Use one of the sql builder libraries
+
+```sql
+
+	select("COF_NAME", "SUP_ID","PRICE"..)
+	.from("SALES, TOTAL")
+	.where("COF_NAME=? AND SUP_ID=?", 1, 2)
+	.groupBy("COF_NAME")
+	.orderBy("COF_NAME");
+```
+######1.3 Use criteria api
+######1.4 Use an embedded sql DSL like JOOQ,QUERYDSL  
+  
+```java
+
+	create.select(AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME, count())
+	.from(AUTHOR)
+	.join(BOOK).on(AUTHOR.ID.equal(BOOK.AUTHOR_ID))
+	.where(BOOK.LANGUAGE.eq("DE"))
+	.and(BOOK.PUBLISHED.gt(date("2008-01-01")))
+	.groupBy(AUTHOR.FIRST_NAME, AUTHOR.LAST_NAME)
+	.having(count().gt(5))
+	.orderBy(AUTHOR.LAST_NAME.asc().nullsFirst())
+	.limit(2)
+	.offset(1)
+```
+
+All of these techniques have some pluses and minuses, Most common weaknesses are
+  
+  - On a change,you have to convert the related code to sql form, update and test the query on an externel sql client, then convert the query back to java form for the used technique.
+  - It still error-prone , you can't be sure the code is valid until it run
+  - You could not map all type sqls because of the limitation of apis
+  - Some of these techinques work only specific databases only
+
+Infact, There is more clean solution having none of these weaknesses superior to these techniques 
+	
+######1.5  Don't try to embed sql into java and just use external sql scripts as a resource
+
+Some of the advantages of using external sql script over embedding are;  
+
+1. You may change the queries without recompilation
+2. You dont have to change the code whenever the query change.
+3. You can use the advantages of sql IDEs (syntax-highlighting,auto complete,validation)
+4. Less verbose and error prone with the help of the IDEs
+
+olives4j-sql provides a clean solution for using external sql scripts.
+it is intended to be able to parse any ordinary sql/plsql script file.
+it use an extension concept, SQL annotation, which allow adding extra behaviour to sql scripts to integrate sql with code easier
+
+##### External SQL and SQL Annotation
+
+The concept is like javadoc annotations
+
+- SQL annotations may be defined in line or block comments 
+- SQL comments must be started with @ character to be annotation 
+- SQL comments must be started with @: characters to be binding annotation a shortcut form for bindings  
+		
+	--@[annotation_name] [annotation parameters] 
+	/*@[annotation_name] [annotation parameters] */
+
+	--@:[binding_parameter_name] [binding parameters] 
+	/*@:[binding_parameter_name] [binding parameters] */
+    
+Processing logic for the sql annotations is responsibility of the application developer,
+SQL api just provides #getAnnotations() method to inquire the annotations.  Besides, There are some special built in annotations which are handled by the library
+
+- @NAMED <NAME> used to name sql queries.
+	SQLReader create SQL with the name defined in @NAMED annotation.    
+- @:<bindingParameterName> used to define bindings. 
+	SQLReader create SQL with these bindings and properties      
+
+
+
+##### Main Components 
+
+* SQLReader; Sql script parser to parsing any sql/plsql script context into collection of SQL instances. 
+* STree Api; A data structure to build and modify structural strings dynamicly as an alternative to StringBuilder 
+* SQL Api  ; An extension to Stree data structure to add sql support 
+* Some utilities which handle with sql strings    
+
+- It is not provide any abstraction or functionality for database access, deal only with sql and binding.
+
+
 
 Compare
 -------
@@ -332,30 +366,6 @@ TBC
 	List list = query.list();
 ```
 
-External SQL and SQL Annotation
------
-
-Olives4j-sql is intended to be able to parse any ordinary sql/plsql script file.
-it use an extension concept, SQL annotation, which allow adding extra behaviour to sql scripts to integrate sql with code easier
-The SQL annotation is like javadoc annotations
-
-- SQL annotations may be defined in line or block comments 
-- SQL comments must be started with @ sign to be annotation and started with @: binding annotation  
-		
-	--@[annotation_name] [annotation parameters] 
-	/*@[annotation_name] [annotation parameters]
-
-	--@:[binding_parameter_name] [binding parameters] 
-	/*@:[binding_parameter_name] [binding parameters]
-    
-There are some special annotations provided by default with the olives4j-sql. 
-
-- @NAMED <NAME> used to name sql queries.
-	SQLReader create SQL with the name defined in @NAMED annotation.    
-- @:<bindingParameterName> used to define bindings. 
-	SQLReader create SQL with these bindings and properties      
-
-SQL api provides #getAnnotations() method to inquire the annotations.
 
 
 Motivation
