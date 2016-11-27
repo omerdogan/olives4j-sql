@@ -61,7 +61,7 @@ Usage
 
 There are three technique you can use to create dynamic queries with olives4j-sql
 
-1. Create sql programaticly by providing bindings while building sql
+1.Create sql programaticly by providing bindings while building sql
 
 ```java
 
@@ -74,7 +74,7 @@ There are three technique you can use to create dynamic queries with olives4j-sq
 			
 ```
 
-2. Create sql programaticly with named parameters and set binding parameter values later
+2.Create sql programaticly with named parameters and set binding parameter values later
 
 ```java
 
@@ -90,7 +90,7 @@ There are three technique you can use to create dynamic queries with olives4j-sq
 ```
 
 
-3. Use an external sql script file 
+3.Use an external sql script file 
 
 -- app.sql file content -------------------
 
@@ -134,8 +134,6 @@ There are three technique you can use to create dynamic queries with olives4j-sq
 
 
 ###Overview
-
-JDBC is very powerful and flexible api, But it is also very low level and verbose.   
 
 > Sometimes it seems like programmers will do everything to avoid SQL. 
 > At the same time DSLs (Domain Specific Languages) are very popular. 
@@ -186,12 +184,12 @@ So What we can do currently
 	.offset(1)
 ```
 
-All of these techniques have some pluses and minuses, Most common weaknesses are
+All of these techniques have share the following weaknesses 
   
   - On a change,you have to convert the related code to sql form, update and test the query on an externel sql client, then convert the query back to java form for the used technique.
   - It still error-prone , you can't be sure the code is valid until it run
   - You could not map all type sqls because of the limitation of apis
-  - Some of these techinques work only specific databases only
+  - Some of these techinques applicaple only specific databases only
 
 Infact, There is more clean solution having none of these weaknesses superior to these techniques 
 	
@@ -231,6 +229,9 @@ SQL api just provides #getAnnotations() method to inquire the annotations.  Besi
 	SQLReader create SQL with these bindings and properties      
 
 
+#####2. Binding Parameters
+
+TBC
 
 ##### Main Components 
 
@@ -245,14 +246,7 @@ SQL api just provides #getAnnotations() method to inquire the annotations.  Besi
 
 Compare
 -------
-
-An application working with a relational data use one or more of the techniques below.
-+ plain jdbc. 
-+ an abstraction api (apache dbutils)
-+ object mapping api with sql or sql like query language (hql,jpql)
-+ ~~object mapping api without any query.~~
-
-Below contains examples to compare olives4j-sql with a few well known libraries used for these techniques
+Below contains examples to compare olives4j-sql with a few well known libraries and techniques
 
 ##### Sample User Input
 ```java
@@ -389,7 +383,7 @@ Lets take a scenerio for a sql related change on an ordinary database project
     ```
 	
 * Execute the query and test if it is correct
-* Define the binding parameters and convert inline parameters to bindings
+* Define the bind variables and convert inline parameters to bindings
 
  ```sql
 	select * 
