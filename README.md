@@ -94,7 +94,8 @@ There are three technique you can use to create dynamic queries with olives4j-sq
 
 -- app.sql file content -------------------
 
-	```sql
+```sql
+
 	--@NAMED search_customer
 	select * 
 	from customer 
@@ -113,8 +114,7 @@ There are three technique you can use to create dynamic queries with olives4j-sq
 	and customer_id=:customer_id
 	;
 	....
-
-	```
+```
 
 -- Java code ------------------------------	
 
