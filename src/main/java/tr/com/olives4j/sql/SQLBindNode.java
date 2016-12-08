@@ -27,44 +27,45 @@ import tr.com.olives4j.stree.StreeNode;
 import tr.com.olives4j.stree.StreeNodeMatcher;
 
 /**
- * 
+ * An SQL node holds a binding definition
  */
 public class SQLBindNode extends StreeNode implements SQLBind {
-	/****/
+	/** Name of this binding**/
 	public String name;
-	/****/
+	/** Value of this binding **/
 	private Object value;
-	/****/
+	/** Default value**/
 	private Object defaultValue;
-	/****/
+	/** Holds if this binding is optional **/
 	private boolean optional;
-	/****/
+	/** Holds if this binding is inlined into the final sql query **/
 	private boolean inline;
-	/****/
+	/** Hold the jdbc type **/
 	private Integer jdbcType;
-
+	/** Holds the seperator characters. Default is ',' character*/
 	private String seperator = ",";
 
 	/**
-	 * 
+	 * Construct SQLBindNode with default properties
 	 */
 	public SQLBindNode() {
 		super();
 	}
 
 	/**
+	 * Construct SQLBindNode with the given parameters
 	 * 
-	 * @param var
-	 * @param vars
+	 * @param var first parameter
+	 * @param vars rest of the parameter if exists
 	 */
 	public <T> SQLBindNode(T var, T... vars) {
 		value(var, vars);
 	}
 
 	/**
-	 * 
-	 * @param var
-	 * @param vars
+	 * @param name name of this binding
+	 * @param var first parameter
+	 * @param vars rest of the parameter if exists
 	 */
 	public <T> SQLBindNode(String name, T var, T... vars) {
 		name(name);
@@ -73,8 +74,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 
 	/**
 	 * 
-	 * @param name
-	 * @param it
+	 * @param it target nodes iterator 
 	 */
 	public <T> SQLBindNode(Iterable<T> it) {
 		value(it);
@@ -104,7 +104,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 
 	/**
 	 * 
-	 * @return
+	 * @see tr.com.olives4j.sql.SQLBind#jdbcType()
 	 */
 	public Integer jdbcType() {
 		return this.jdbcType;
@@ -123,7 +123,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 
 	/**
 	 * 
-	 * @return
+	 * @see tr.com.olives4j.sql.SQLBind#
 	 */
 	public boolean isInline() {
 		return this.inline;

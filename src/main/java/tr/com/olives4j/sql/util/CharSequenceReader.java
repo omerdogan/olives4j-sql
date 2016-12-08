@@ -19,6 +19,10 @@ package tr.com.olives4j.sql.util;
 import java.io.Reader;
 import java.io.Serializable;
 
+/**
+ * 
+ * Reader implementation that can read from String, StringBuffer, StringBuilder or CharBuffer. 
+ */
 @SuppressWarnings("serial")
 public class CharSequenceReader extends Reader implements Serializable {
 	private static enum TYPE {

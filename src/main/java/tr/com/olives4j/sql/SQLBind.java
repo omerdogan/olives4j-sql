@@ -23,107 +23,120 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 
+ * @author omer.dogan
+ *
+ */
 public interface SQLBind {
 	public static final BeanMapper BEANMAPPER = new BeanMapper();
 
 	/**
 	 * 
-	 * @param name
+	 * @param name set the bind name
 	 * @return
 	 */
 	SQLBind name(String name);
 
 	/**
 	 * 
-	 * @param name
+	 * @param jdbcType target jdbc type 
 	 * @return
 	 */
-	SQLBind jdbcType(Integer type);
-
+	SQLBind jdbcType(Integer jdbcType);
+	
 	/**
 	 * 
-	 * @return
-	 */
-	SQLBind optional();
-
-	/**
-	 * 
-	 * @return
-	 */
-	SQLBind required();
-
-	/**
-	 * 
-	 * @param inline
+	 * @param inline setter if this binding is refer to an inline parameter or binding
 	 * @return
 	 */
 	SQLBind inline(boolean inline);
 
 	/**
 	 * 
-	 * @param seperator
+	 * @param seperator holds the target seperator characters
 	 * @return
 	 */
 	SQLBind seperator(String seperator);
 
 	/**
 	 * 
-	 * @param param
+	 * @param defaultValue holds the value assigned by default if no value provided
 	 * @return
 	 */
-	public SQLBind defaultValue(Object param);
+	public SQLBind defaultValue(Object defaultValue);
 
 	/**
 	 * 
-	 * @param param
+	 * @param exclude flag indicates if this node is excluded from final output or not
 	 * @return
 	 */
 	public SQLBind exclude(boolean exclude);
 
 	/**
-	 * @return
+	 * 
+	 * @return if this binding is optional
+	 */
+	SQLBind optional();
+
+	/**
+	 * 
+	 * @return if this binding is required
+	 */
+	SQLBind required();
+	
+	/**
+	 * @return name of the binding
 	 */
 	public String getName();
 
 	/**
-	 * @return
+	 * @return  if this node is excluded from final output or not   
 	 */
 	public boolean isExcluded();
 
 	/**
-	 * @return
+	 * @return if this is an optional node
 	 */
 	public boolean isOptional();
-
+	
 	/**
-	 * @return
+	 * @return if this is inline paramter
+	 */
+	public boolean isInline();
+	
+	/**
+	 * @return default value used if no user defined value provided
 	 */
 	public Object getDefaultValue();
 
 	/**
-	 * @return
+	 * @return the target value
 	 */
 	public Object value();
 
 	/**
-	 * @return
+	 * @return extract the value as collection 
 	 */
 	public Collection<Object> extract();
 	
 	/**
-	 * @return
+	 * @return extract the value into given collection 
 	 */
 	public Collection<Object> extract(Collection<Object> c);
 
+	// Inner classes /////////////////////////////////////////
+
 	/**
-	 * 
-	 * @author omer.dogan
-	 *
+	 * Define an inteface for mapping named parameter values 
 	 */
 	public interface Mapper {
 		Object map(SQLBindNode binding, Object bean);
 	}
 
+	/**
+	 * 
+	 */
 	public static final class BeanMapper implements Mapper {
 		@Override
 		public Object map(SQLBindNode binding, Object bean) {
@@ -146,9 +159,7 @@ public interface SQLBind {
 	};
 
 	/**
-	 * 
-	 * @author omer.dogan
-	 *
+	 * Wrapper object for the binding instances with the same name
 	 */
 	public static class Set implements SQLBind {
 		List<SQLBind> set;
@@ -279,6 +290,11 @@ public interface SQLBind {
 		}
 
 		@Override
+		public boolean isInline() {
+			return set.get(0).isInline();
+		}
+		
+		@Override
 		public Object getDefaultValue() {
 			return set.get(0).getDefaultValue();
 		}
@@ -298,5 +314,4 @@ public interface SQLBind {
 			return set.get(0).extract(c);
 		}
 	}
-
 }

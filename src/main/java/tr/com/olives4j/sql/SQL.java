@@ -17,7 +17,6 @@
 package tr.com.olives4j.sql;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,8 +30,8 @@ import tr.com.olives4j.stree.StreeNode;
 import tr.com.olives4j.stree.StreeNodeMatcher;
 
 /**
- * SQL is a tree like data structure to build sql statements.The main element of
- * this structure is {@code StreeNode} which are added by appropriate
+ * SQL is a tree like data structure to build sql statements. The main element
+ * of this structure is {@code StreeNode} which are added by appropriate
  * {@code #append} methods. Sql statement is constructed by these nodes . Any
  * modification on data structure invalidate the internal buffer and force
  * reconstraction of sql.
@@ -43,16 +42,16 @@ import tr.com.olives4j.stree.StreeNodeMatcher;
  * <br/>
  * which are overloaded so as to accept data in any type. Typically
  * 
+ * @see Stree
  * @author omer.dogan
  * 
  */
 public class SQL extends Stree {
-	/** **/
+	/** Iterator instance for traversing sql bind nodes **/
 	private static final StreeNodeMatcher<SQLBindNode> BINDS = new StreeNodeMatcher<SQLBindNode>(SQLBindNode.class, false);
-	/** **/
+	/** Hold the SQL instance count **/
 	private static final AtomicInteger instanceCounter = new AtomicInteger();
-
-	/** */
+	/** Hold default options */
 	public static final Options DEFAULT_OPTIONS = new Options();
 
 	/**
@@ -73,13 +72,14 @@ public class SQL extends Stree {
 	}
 
 	/**
-	 * Construct empty sql
+	 * Construct empty sql with the given options
 	 */
 	public SQL(Options options) {
-		this("SQL-" + instanceCounter.incrementAndGet(),DEFAULT_OPTIONS.clone());
+		this("SQL-" + instanceCounter.incrementAndGet(), DEFAULT_OPTIONS.clone());
 	}
 
 	/**
+	 * Construct empty sql with the given name
 	 * 
 	 * @param name
 	 *            name of this instance
@@ -89,13 +89,16 @@ public class SQL extends Stree {
 		this.bindings = new SQLBindings(this);
 		this.options = (Options) DEFAULT_OPTIONS.clone();
 	}
-	
+
 	/**
+	 * Construct empty sql with the given name and options
 	 * 
+	 * @param options
+	 *            sql options
 	 * @param name
 	 *            name of this instance
 	 */
-	public SQL(String name,Options options) {
+	public SQL(String name, Options options) {
 		super(name);
 		this.options = options;
 		this.bindings = new SQLBindings(this);
@@ -111,7 +114,9 @@ public class SQL extends Stree {
 
 	/**
 	 * 
-	 * @return new SQL instance with given nodes
+	 * @param exprs
+	 *            variable number of sql nodes
+	 * @return new SQL instance initiazed with the given nodes
 	 */
 	public static SQL of(Object... exprs) {
 		SQL tree = new SQL();
@@ -133,6 +138,8 @@ public class SQL extends Stree {
 
 	/**
 	 * 
+	 * @param node
+	 *            target node
 	 */
 	@Override
 	public StreeGroup append(StreeNode node) {
@@ -150,7 +157,8 @@ public class SQL extends Stree {
 	/**
 	 * 
 	 * @param query
-	 * @return
+	 *            A CharSequence holding SQL content
+	 * @return SQL type instance representing the given SQL content
 	 */
 	@Override
 	protected StreeNode parse(CharSequence query) {
@@ -217,7 +225,7 @@ public class SQL extends Stree {
 
 	/**
 	 * 
-	 * @return
+	 * @return SQL string formatted and binding values placed
 	 */
 	public StringBuilder format() {
 		String content = this.toString();
@@ -236,16 +244,25 @@ public class SQL extends Stree {
 
 	/**
 	 * 
-	 * @return
+	 * @return the parameter bindings
 	 */
 	public SQLBindings bindings() {
 		return bindings;
 	}
 
+	/**
+	 * 
+	 * @return options
+	 */
 	public Options getOptions() {
 		return options;
 	}
 
+	/**
+	 * 
+	 * @param options
+	 *            to set
+	 */
 	public void setOptions(Options options) {
 		this.options = options;
 	}
@@ -253,23 +270,23 @@ public class SQL extends Stree {
 	// Builder methods /////////////////////////////////////////
 
 	/**
+	 * shortcut to create SQLBindNode
 	 * 
-	 * @return
+	 * @param var
+	 *            first parameter
+	 * @param vars
+	 *            rest of the parameters
+	 * @return SQLBind instance
 	 */
 	public static <T> SQLBind $(final T var, final T... vars) {
 		return new SQLBindNode(var, vars);
 	}
 
+	// Inner classes /////////////////////////////////////////
+
 	/**
-	 * 
-	 * @return
+	 * Hold SQL options
 	 */
-	public static SQLBind $(final Object[] vars, boolean inParameter) {
-		return new SQLBindNode().value(Arrays.asList(vars));
-	}
-
-	// Sub classes /////////////////////////////////////////
-
 	static class Options implements Cloneable {
 		boolean keepFormat = false;
 		SQLFormatter formatter = SQLFormatter.INSTANCE;
@@ -281,7 +298,7 @@ public class SQL extends Stree {
 		@Override
 		protected Options clone() {
 			try {
-				return (Options)super.clone();
+				return (Options) super.clone();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

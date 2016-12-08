@@ -54,8 +54,8 @@ public class SQLBindings implements Collection<SQLBindNode> {
 	/**
 	 * Populate the named binding variables with given context
 	 * 
-	 * @param expression
-	 * @param value
+	 * @param bean
+	 * @param mapper
 	 */
 	public SQLBindings map(Object bean, SQLBind.Mapper mapper) {
 		for (SQLBindNode sqlBind : nodes) {
@@ -66,7 +66,7 @@ public class SQLBindings implements Collection<SQLBindNode> {
 
 	/**
 	 * 
-	 * @param expression
+	 * @param index
 	 * @param value
 	 */
 	public SQLBind bind(int index, Object value) {
@@ -117,7 +117,7 @@ public class SQLBindings implements Collection<SQLBindNode> {
 
 	/**
 	 * 
-	 * @return
+	 * @return the binding node in the given index
 	 */
 	public SQLBind get(int index) {
 		SQLBindNode bind = nodes.get(index);
@@ -131,7 +131,7 @@ public class SQLBindings implements Collection<SQLBindNode> {
 
 	/**
 	 * 
-	 * @return
+	 * @return the binding node for the given name
 	 */
 	public SQLBind get(String name) {
 		ArrayList<SQLBindNode> findings = new ArrayList<SQLBindNode>();
@@ -145,9 +145,8 @@ public class SQLBindings implements Collection<SQLBindNode> {
 	}
 
 	/**
-	 * 
+	 * Utility method set binding node values to given PreparedStatement
 	 * @param pstmt
-	 * @throws SQLException
 	 */
 	public void apply(PreparedStatement pstmt) {
 		try {
@@ -174,7 +173,7 @@ public class SQLBindings implements Collection<SQLBindNode> {
 
 	/**
 	 * 
-	 * @return
+	 * @return iterator
 	 */
 	public Iterator<SQLBindNode> iterator() {
 		Iterator<SQLBindNode> iterator = this.nodes.iterator();

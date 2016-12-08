@@ -21,6 +21,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 /**
+ * This class consists exclusively of static methods that operate on or return
+ * SQL
  * 
  * @author omer.dogan
  *

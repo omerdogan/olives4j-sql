@@ -31,6 +31,7 @@ import tr.com.olives4j.sql.util.CharSequenceReader;
 import tr.com.olives4j.stree.StreeAnnotation;
 
 /**
+ * Parse sql text into SQL types
  * 
  * @author omer.dogan
  * 
@@ -46,7 +47,7 @@ public class SQLReader {
 	}
 
 	/*
-	 * 
+	 * @param content
 	 * @return List of query strings
 	 */
 	public static SQLCollection read(CharSequence content) {
@@ -55,7 +56,8 @@ public class SQLReader {
 	}
 
 	/*
-	 * 
+	 * @param content
+	 * @param options
 	 * @return List of query strings
 	 */
 	public static SQLCollection read(CharSequence content, Options options) {
@@ -64,8 +66,7 @@ public class SQLReader {
 
 	/*
 	 * 
-	 * 
-	 * @return List of query strings
+	 * @return SQL collection type as a result of parsing given reader content
 	 */
 	public static SQLCollection read(Reader br) {
 		return read(br, null);
@@ -73,7 +74,7 @@ public class SQLReader {
 
 	/*
 	 * 
-	 * @return List of query strings
+	 * @return SQL collection type as a result of parsing given reader content with the given options
 	 */
 	public static SQLCollection read(Reader reader, Options options) {
 		if (options == null) {
@@ -232,7 +233,7 @@ public class SQLReader {
 					} while (creader.hasNext() && (c != '\n'));
 
 					if (annotation) {
-						processAnnotation(sql, isSqlStarted, buffer, lastCommentStart + 2, buffer.length() - 1, options);
+						processAnnotation(sql, isSqlStarted, buffer, lastCommentStart + 2, buffer.length(), options);
 					}
 
 					currentTag = SYNTAX.NA;
@@ -384,9 +385,7 @@ public class SQLReader {
 	 */
 	private static void processAnnotation(SQL sql, boolean isBeforeSql, StringBuilder buffer, int start, int end, Options options) {
 		String expression = buffer.substring(start, end);
-		if (!options.keepComments) {
-			buffer.setLength(start - 2);
-		}
+		
 
 		String[] exprargs = expression.split("[ @\r\t\n]", 3);
 		String triggerName = exprargs[1];
@@ -418,6 +417,10 @@ public class SQLReader {
 				}
 			}
 
+			if (!options.keepComments) {
+				buffer.setLength(start - 2);
+			}
+			
 			int bufferLength = buffer.length();
 			int i = bufferLength - 1;
 			for (; i >= 0; i--) {
@@ -727,16 +730,6 @@ public class SQLReader {
 		 * This method cache the given number of characters in chars array
 		 * 
 		 * 
-		 * @param r
-		 *            the reader
-		 * @param chars
-		 *            read the characters into this char array
-		 * @param cacheSize
-		 *            number of characters cached
-		 * @param i
-		 *            index number to read from the chars
-		 * @param rel
-		 *            to access the relative
 		 * @return
 		 * @throws IOException
 		 */
@@ -765,7 +758,7 @@ public class SQLReader {
 	}
 
 	/**
-	 * SQL Options
+	 * SQLReader options
 	 */
 	public static class Options {
 		public int parameterCount;
