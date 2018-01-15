@@ -20,7 +20,7 @@ package tr.com.olives4j.stree;
  * Defines the requirements for an object that can be used as a tree node in a
  * {@code Stree}.
  */
-public class StreeNode  {
+public abstract class StreeNode {
 	/**
 	 * Holds parent node
 	 */
@@ -48,18 +48,6 @@ public class StreeNode  {
 		super();
 		this.exclude = parent.exclude;
 		this.parent = parent;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public StreeNode depends(StreeNode targetNode){
-		StreeNode root = root();
-		if(root instanceof Stree){
-			((Stree) root).getDependencies().put(this, targetNode);
-		}
-		return this;
 	}
 
 	/**
@@ -130,13 +118,16 @@ public class StreeNode  {
 		return this;
 	}
 
-
 	// Object implementation //////////////////////////////
 	/**
 	 * Return a copy of this node
 	 */
 	public StreeNode clone() {
-		return new StreeNode(this.parent);
+		try {
+			return (StreeNode) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**

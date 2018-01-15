@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -67,18 +68,20 @@ public class TestBase {
 		logger.debug(buffer);
 	}
 
-	public void checkBind(SQL sql, int bindIndex, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue,
-			Object value) {
-		checkBind(sql, sql.bindings().get(bindIndex), numOfValues, optional, excluded, excludedClauseIndex, defaultValue, value);
+	public void checkBind(SQL sql, int bindIndex, int numOfValues, boolean optional, boolean excluded,
+			Integer excludedClauseIndex, Object defaultValue, Object value) {
+		checkBind(sql, sql.bindings().get(bindIndex), numOfValues, optional, excluded, excludedClauseIndex,
+				defaultValue, value);
 	}
 
-	public void checkBind(SQL sql, String bindName, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue,
-			Object value) {
-		checkBind(sql, sql.bindings().get(bindName), numOfValues, optional, excluded, excludedClauseIndex, defaultValue, value);
+	public void checkBind(SQL sql, String bindName, int numOfValues, boolean optional, boolean excluded,
+			Integer excludedClauseIndex, Object defaultValue, Object value) {
+		checkBind(sql, sql.bindings().get(bindName), numOfValues, optional, excluded, excludedClauseIndex, defaultValue,
+				value);
 	}
 
-	public void checkBind(SQL sql, SQLBind bind, int numOfValues, boolean optional, boolean excluded, Integer excludedClauseIndex, Object defaultValue,
-			Object value) {
+	public void checkBind(SQL sql, SQLBind bind, int numOfValues, boolean optional, boolean excluded,
+			Integer excludedClauseIndex, Object defaultValue, Object value) {
 		sql.process();
 		Assert.assertEquals(bind.extract().size(), numOfValues);
 		Assert.assertEquals(bind.isOptional(), optional);
@@ -176,7 +179,8 @@ public class TestBase {
 			if (next instanceof StreeGroup) {
 				buffer.append(toTree((StreeGroup) next, deep + 1));
 			} else {
-				buffer.append(tabs.substring(0, deep + 1)).append(next.getClass().getSimpleName() + "#" + next.hashCode());
+				buffer.append(tabs.substring(0, deep + 1))
+						.append(next.getClass().getSimpleName() + "#" + next.hashCode());
 			}
 			buffer.append("\n");
 		}
@@ -184,8 +188,8 @@ public class TestBase {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static final List<Class<? extends Object>> LEAVES = Arrays.asList(Boolean.class, Character.class, Byte.class, Short.class, Integer.class,
-			Long.class, Float.class, Double.class, Void.class, String.class);
+	private static final List<Class<? extends Object>> LEAVES = Arrays.asList(Boolean.class, Character.class,
+			Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class, String.class);
 
 	private static Set<Class<?>> wrapperTypes = new HashSet<Class<?>>() {
 		{
@@ -217,6 +221,13 @@ public class TestBase {
 		if (o instanceof String) {
 			return sb.toString();
 		} else if (o.getClass().isPrimitive()) {
+			return sb.toString();
+		} else if (Collection.class.isAssignableFrom(o.getClass())) {
+			Iterator iterator = ((Collection) o).iterator();
+			while (iterator.hasNext()) {
+				Object next = iterator.next();
+				toStringRecursive(next, deep);
+			}
 			return sb.toString();
 		}
 
@@ -274,11 +285,11 @@ public class TestBase {
 	}
 
 	protected void execute(SQL sql) throws SQLException {
-		Connection conn=getConnection();
+		Connection conn = getConnection();
 		PreparedStatement pstmt = conn.prepareStatement(sql.toString());
 		sql.bindings().apply(pstmt);
 		ResultSet rs = pstmt.executeQuery();
-		while(rs.next()){
+		while (rs.next()) {
 			System.out.println(rs.getString(1));
 		}
 	}

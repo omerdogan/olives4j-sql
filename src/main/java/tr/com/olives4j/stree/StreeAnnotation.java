@@ -43,12 +43,12 @@ public class StreeAnnotation extends StreeNode {
 		super();
 		this.expression = expression;
 	}
-	
+
 	/**
 	 * 
 	 */
 	@Override
 	public String toString() {
-		return "StreeAnnotation [expression="+ expression + "]";
+		return "StreeAnnotation [expression=" + expression + "]";
 	}
 }

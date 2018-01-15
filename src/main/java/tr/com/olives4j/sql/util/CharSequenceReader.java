@@ -21,7 +21,8 @@ import java.io.Serializable;
 
 /**
  * 
- * Reader implementation that can read from String, StringBuffer, StringBuilder or CharBuffer. 
+ * Reader implementation that can read from String, StringBuffer, StringBuilder
+ * or CharBuffer.
  */
 @SuppressWarnings("serial")
 public class CharSequenceReader extends Reader implements Serializable {
@@ -86,7 +87,8 @@ public class CharSequenceReader extends Reader implements Serializable {
 	/**
 	 * Read a single character.
 	 * 
-	 * @return the next character from the character sequence or -1 if the end has been reached.
+	 * @return the next character from the character sequence or -1 if the end has
+	 *         been reached.
 	 */
 	public int read() {
 		if (idx >= length) {
@@ -115,8 +117,8 @@ public class CharSequenceReader extends Reader implements Serializable {
 			throw new NullPointerException("Character array is missing");
 		}
 		if (length < 0 || (offset + length) > array.length) {
-			throw new IndexOutOfBoundsException("Array Size=" + array.length + ", offset=" + offset + ", length="
-					+ length);
+			throw new IndexOutOfBoundsException(
+					"Array Size=" + array.length + ", offset=" + offset + ", length=" + length);
 		}
 
 		switch (type) {
@@ -222,7 +224,8 @@ public class CharSequenceReader extends Reader implements Serializable {
 	}
 
 	/**
-	 * Reset the reader to the last marked position (or the beginning if mark has not been called).
+	 * Reset the reader to the last marked position (or the beginning if mark has
+	 * not been called).
 	 */
 	public void reset() {
 		idx = mark;

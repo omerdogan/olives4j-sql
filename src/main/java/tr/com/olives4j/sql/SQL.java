@@ -48,7 +48,8 @@ import tr.com.olives4j.stree.StreeNodeMatcher;
  */
 public class SQL extends Stree {
 	/** Iterator instance for traversing sql bind nodes **/
-	private static final StreeNodeMatcher<SQLBindNode> BINDS = new StreeNodeMatcher<SQLBindNode>(SQLBindNode.class, false);
+	private static final StreeNodeMatcher<SQLBindNode> BINDS = new StreeNodeMatcher<SQLBindNode>(SQLBindNode.class,
+			false);
 	/** Hold the SQL instance count **/
 	private static final AtomicInteger instanceCounter = new AtomicInteger();
 	/** Hold default options */
@@ -214,7 +215,7 @@ public class SQL extends Stree {
 		}
 
 		if (nodes.size() == 0) {
-			return new StreeNode();
+			return new StreeClause();
 		} else if (nodes.size() == 1) {
 			return nodes.get(0);
 		} else {
@@ -278,6 +279,7 @@ public class SQL extends Stree {
 	 *            rest of the parameters
 	 * @return SQLBind instance
 	 */
+	@SafeVarargs
 	public static <T> SQLBind $(final T var, final T... vars) {
 		return new SQLBindNode(var, vars);
 	}

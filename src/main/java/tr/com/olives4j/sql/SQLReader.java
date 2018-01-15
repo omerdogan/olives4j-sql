@@ -48,6 +48,7 @@ public class SQLReader {
 
 	/*
 	 * @param content
+	 * 
 	 * @return List of query strings
 	 */
 	public static SQLCollection read(CharSequence content) {
@@ -57,7 +58,9 @@ public class SQLReader {
 
 	/*
 	 * @param content
+	 * 
 	 * @param options
+	 * 
 	 * @return List of query strings
 	 */
 	public static SQLCollection read(CharSequence content, Options options) {
@@ -74,7 +77,8 @@ public class SQLReader {
 
 	/*
 	 * 
-	 * @return SQL collection type as a result of parsing given reader content with the given options
+	 * @return SQL collection type as a result of parsing given reader content with
+	 * the given options
 	 */
 	public static SQLCollection read(Reader reader, Options options) {
 		if (options == null) {
@@ -94,7 +98,6 @@ public class SQLReader {
 		boolean isPlsqlBlock = false;
 		boolean isNewLine = false;
 
-		int paramIndex = 0;
 		int lastCommentStart = -1;
 		int plsqlBeginDept = 0;
 		boolean wasPlsqlBlock = false;
@@ -113,7 +116,6 @@ public class SQLReader {
 		String plsqlEndName = "";
 		boolean plsqlStartWord = false;
 
-		boolean exit = false;
 		try {
 			while (true) {
 				if (creader.hasNext()) {
@@ -272,7 +274,6 @@ public class SQLReader {
 						sql.append(buffer);
 						buffer.setLength(0);
 						sql.append(new SQLBindNode().name(paramName));
-						paramIndex++;
 					} else if (lastWordStart == '$') {
 						if (options.params != null && Character.isJavaIdentifierStart(lastWordStart)) {
 							replaceInlineParam(options, buffer, lastWord);
@@ -345,7 +346,6 @@ public class SQLReader {
 
 					buffer.setLength(0);
 					plsqlBeginDept = 0;
-					paramIndex = 0;
 					prevWord = "";
 					plsqlEndName = "";
 					plsqlStartWord = false;
@@ -383,9 +383,9 @@ public class SQLReader {
 	 * @param start
 	 * @param end
 	 */
-	private static void processAnnotation(SQL sql, boolean isBeforeSql, StringBuilder buffer, int start, int end, Options options) {
+	private static void processAnnotation(SQL sql, boolean isBeforeSql, StringBuilder buffer, int start, int end,
+			Options options) {
 		String expression = buffer.substring(start, end);
-		
 
 		String[] exprargs = expression.split("[ @\r\t\n]", 3);
 		String triggerName = exprargs[1];
@@ -412,7 +412,8 @@ public class SQLReader {
 						String val = next.substring(next.indexOf(":"));
 						bind.defaultValue(val);
 					} catch (Exception e) {
-						throw new RuntimeException("Parse failed reading binding annotation " + paramName + " parameter: " + next, e);
+						throw new RuntimeException(
+								"Parse failed reading binding annotation " + paramName + " parameter: " + next, e);
 					}
 				}
 			}
@@ -420,7 +421,7 @@ public class SQLReader {
 			if (!options.keepComments) {
 				buffer.setLength(start - 2);
 			}
-			
+
 			int bufferLength = buffer.length();
 			int i = bufferLength - 1;
 			for (; i >= 0; i--) {
@@ -489,11 +490,14 @@ public class SQLReader {
 							try {
 								if (Character.isDigit(ch)) {
 									defaultValue = NumberFormat.getInstance().parse((String) defaultValue);
-								} else if (defaultValue.toString().equalsIgnoreCase("true") || defaultValue.toString().equalsIgnoreCase("false")) {
+								} else if (defaultValue.toString().equalsIgnoreCase("true")
+										|| defaultValue.toString().equalsIgnoreCase("false")) {
 									defaultValue = Boolean.valueOf(defaultValue.toString());
 								}
 							} catch (Exception e) {
-								throw new RuntimeException("Parse failed reading binding annotation " + paramName + " buffer: " + buffer, e);
+								throw new RuntimeException(
+										"Parse failed reading binding annotation " + paramName + " buffer: " + buffer,
+										e);
 							}
 							first = i;
 							break;
@@ -667,8 +671,8 @@ public class SQLReader {
 		 */
 		public char prev(int i) throws IOException {
 			if (i > cacheSize) {
-				throw new IndexOutOfBoundsException(
-						"Index is out of the cache bound! Cache Size:" + cacheSize + ", pos:" + i + ", available character size:" + lastLength);
+				throw new IndexOutOfBoundsException("Index is out of the cache bound! Cache Size:" + cacheSize
+						+ ", pos:" + i + ", available character size:" + lastLength);
 			}
 			if (!isInitialized) {
 				init();
@@ -691,8 +695,8 @@ public class SQLReader {
 		 */
 		public char next(int i) throws IOException {
 			if (i > cacheSize) {
-				throw new IndexOutOfBoundsException(
-						"Index is out of the cache bound! Cache Size:" + cacheSize + ", pos:" + i + ", available character size:" + lastLength);
+				throw new IndexOutOfBoundsException("Index is out of the cache bound! Cache Size:" + cacheSize
+						+ ", pos:" + i + ", available character size:" + lastLength);
 			}
 			if (!isInitialized) {
 				init();
@@ -703,8 +707,8 @@ public class SQLReader {
 			if (noMoreRead && index >= lastLength) {
 				return '\0';
 			} else if (index >= chars.length) {
-				throw new IndexOutOfBoundsException(
-						"Index is out of the cache bound! Cache Size:" + cacheSize + ", pos:" + index + ", available character size:" + chars.length);
+				throw new IndexOutOfBoundsException("Index is out of the cache bound! Cache Size:" + cacheSize
+						+ ", pos:" + index + ", available character size:" + chars.length);
 			}
 
 			return chars[index];
@@ -726,8 +730,8 @@ public class SQLReader {
 
 		/**
 		 * Utility method to iterate through the given reader. This method read
-		 * character from reader chunk by chunk into the chars array as needed.
-		 * This method cache the given number of characters in chars array
+		 * character from reader chunk by chunk into the chars array as needed. This
+		 * method cache the given number of characters in chars array
 		 * 
 		 * 
 		 * @return
@@ -771,7 +775,8 @@ public class SQLReader {
 		public boolean disableFormat = true;
 		public char[] wordSeperators = new char[] { ';', ',', '(', ')', '<', '>', '+', '-', '/', '*', '=', '|' };
 		public Pattern plsqlStart = Pattern.compile(
-				"CREATE\\s+(OR\\s+REPLACE)?\\s+(FUNCTION|PROCEDURE|PACKAGE(\\s+BODY)?+)\\s+([a-zA-Z_0-9]+\\.)*([a-zA-Z_0-9]+)$", Pattern.CASE_INSENSITIVE);
+				"CREATE\\s+(OR\\s+REPLACE)?\\s+(FUNCTION|PROCEDURE|PACKAGE(\\s+BODY)?+)\\s+([a-zA-Z_0-9]+\\.)*([a-zA-Z_0-9]+)$",
+				Pattern.CASE_INSENSITIVE);
 
 		/**
 		 * Constructor

@@ -31,7 +31,7 @@ public class SQLS {
 	/**
 	 * 
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public static String generateInsert(String targetTable, ResultSet rs) throws SQLException {
 		ResultSetMetaData mtdt = rs.getMetaData();
@@ -45,9 +45,9 @@ public class SQLS {
 		}
 		sql.deleteCharAt(sql.length() - 1);
 		sql.append(")");
-	
+
 		sql.append(" values (" + repeat("?", ",", columnCount) + ")");
-		
+
 		return sql.toString();
 	}
 

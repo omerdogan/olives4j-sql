@@ -17,7 +17,6 @@
 package tr.com.olives4j.sql;
 
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -75,7 +74,6 @@ public class SQLBindings implements Collection<SQLBindNode> {
 		}
 		SQLBindNode bind = nodes.get(index);
 		bind.value(value);
-		this.sql.setModified(true);
 		return bind;
 	}
 
@@ -101,7 +99,6 @@ public class SQLBindings implements Collection<SQLBindNode> {
 				} else {
 					next.value(value);
 					target = next;
-					this.sql.setModified(true);
 				}
 			}
 		}
@@ -134,7 +131,6 @@ public class SQLBindings implements Collection<SQLBindNode> {
 	 * @return the binding node for the given name
 	 */
 	public SQLBind get(String name) {
-		ArrayList<SQLBindNode> findings = new ArrayList<SQLBindNode>();
 		Set set = new Set();
 		for (SQLBindNode sqlBind : nodes) {
 			if (name.equals(sqlBind.name)) {
@@ -146,6 +142,7 @@ public class SQLBindings implements Collection<SQLBindNode> {
 
 	/**
 	 * Utility method set binding node values to given PreparedStatement
+	 * 
 	 * @param pstmt
 	 */
 	public void apply(PreparedStatement pstmt) {

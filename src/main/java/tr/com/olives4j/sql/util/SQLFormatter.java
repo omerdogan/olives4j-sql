@@ -33,7 +33,8 @@ public class SQLFormatter {
 	 * @param buffer
 	 * @return
 	 */
-	public final StringBuilder format(CharSequence sql, int indent, List<?> params, StringBuilder buffer, boolean keepFormat) {
+	public final StringBuilder format(CharSequence sql, int indent, List<?> params, StringBuilder buffer,
+			boolean keepFormat) {
 		StringBuilder lastWord = new StringBuilder();
 		char NL = '\n';
 		boolean lastiswhite = false;
@@ -127,7 +128,8 @@ public class SQLFormatter {
 					buffer.append("*/");
 					valIndex++;
 
-					if ((index + 3) < chars.length && chars[index + 1] == '.' && chars[index + 2] == '.' && chars[index + 3] == '.') {
+					if ((index + 3) < chars.length && chars[index + 1] == '.' && chars[index + 2] == '.'
+							&& chars[index + 3] == '.') {
 						index += 3;
 					}
 				}

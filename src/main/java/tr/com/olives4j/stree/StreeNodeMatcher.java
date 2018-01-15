@@ -36,8 +36,8 @@ public class StreeNodeMatcher<T extends StreeNode> implements Predicate<StreeNod
 		this.targetType = targetType;
 		this.exclude = selectExcludes;
 	}
-	
-	public static <T extends StreeNode> StreeNodeMatcher<T> of(Class<T> targetType,Boolean selectExcludes){
+
+	public static <T extends StreeNode> StreeNodeMatcher<T> of(Class<T> targetType, Boolean selectExcludes) {
 		return new StreeNodeMatcher<T>(targetType, selectExcludes);
 	}
 

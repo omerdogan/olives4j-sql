@@ -21,7 +21,7 @@ package tr.com.olives4j.stree;
  */
 public class StreeClause extends StreeNode {
 	/**
-	 * Holds content 
+	 * Holds content
 	 */
 	public CharSequence content;
 
@@ -90,6 +90,6 @@ public class StreeClause extends StreeNode {
 	 */
 	@Override
 	public String toString() {
-		return "StreeClause ["+ content + "]";
+		return "StreeClause [" + content + "]";
 	}
 }

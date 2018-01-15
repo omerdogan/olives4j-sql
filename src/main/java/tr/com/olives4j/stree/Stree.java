@@ -17,7 +17,6 @@
 package tr.com.olives4j.stree;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
 /**
@@ -35,10 +34,9 @@ import java.util.Iterator;
  * 
  */
 public class Stree extends StreeGroup {
-	public static final StreeNodeMatcher<StreeNode> NODES = new StreeNodeMatcher<StreeNode>(StreeNode.class, false);
-	public static final StreeNodeMatcher<StreeAnnotation> ANNOTATIONS = new StreeNodeMatcher<StreeAnnotation>(StreeAnnotation.class, false);
-	public HashMap<StreeNode,StreeNode> dependencies=new HashMap<StreeNode,StreeNode>();
-	
+	private static final StreeNodeMatcher<StreeAnnotation> ANNOTATIONS = new StreeNodeMatcher<StreeAnnotation>(
+			StreeAnnotation.class, false);
+
 	/**
 	 * Hold the descriptor name
 	 */
@@ -73,24 +71,6 @@ public class Stree extends StreeGroup {
 	}
 
 	/**
-	 * 
-	 * @return a new Stree instance with empty content
-	 */
-	public static Stree of() {
-		return new Stree();
-	}
-
-	/**
-	 * 
-	 * @return a new Stree instance with the given content
-	 */
-	public static Stree of(Object... exprs) {
-		Stree tree = new Stree();
-		tree.append(exprs);
-		return tree;
-	}
-
-	/**
 	 * @return the name
 	 */
 	public String name() {
@@ -122,16 +102,7 @@ public class Stree extends StreeGroup {
 		return this;
 	}
 
-
 	// SETTTER/GETTER ///////////////////////////////////////////////
-	/**
-	 * @param sql
-	 *            the sql to set
-	 */
-	public void setContent(String sql) {
-		this.nodes = new ArrayList<StreeNode>();
-		append(sql);
-	}
 
 	/**
 	 * @return the annotations
@@ -139,22 +110,6 @@ public class Stree extends StreeGroup {
 	public Iterator<StreeAnnotation> getAnnotations() {
 		Iterator<StreeAnnotation> iterator = iterator(ANNOTATIONS);
 		return iterator;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public HashMap<StreeNode, StreeNode> getDependencies() {
-		return dependencies;
-	}
-
-	/**
-	 * 
-	 * @param dependencies
-	 */
-	public void setDependencies(HashMap<StreeNode, StreeNode> dependencies) {
-		this.dependencies = dependencies;
 	}
 
 	// Object implementation //////////////////////////////

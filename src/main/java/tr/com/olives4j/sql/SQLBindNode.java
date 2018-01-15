@@ -30,11 +30,11 @@ import tr.com.olives4j.stree.StreeNodeMatcher;
  * An SQL node holds a binding definition
  */
 public class SQLBindNode extends StreeNode implements SQLBind {
-	/** Name of this binding**/
+	/** Name of this binding **/
 	public String name;
 	/** Value of this binding **/
 	private Object value;
-	/** Default value**/
+	/** Default value **/
 	private Object defaultValue;
 	/** Holds if this binding is optional **/
 	private boolean optional;
@@ -42,7 +42,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	private boolean inline;
 	/** Hold the jdbc type **/
 	private Integer jdbcType;
-	/** Holds the seperator characters. Default is ',' character*/
+	/** Holds the seperator characters. Default is ',' character */
 	private String seperator = ",";
 
 	/**
@@ -55,18 +55,25 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	/**
 	 * Construct SQLBindNode with the given parameters
 	 * 
-	 * @param var first parameter
-	 * @param vars rest of the parameter if exists
+	 * @param var
+	 *            first parameter
+	 * @param vars
+	 *            rest of the parameter if exists
 	 */
+	@SafeVarargs
 	public <T> SQLBindNode(T var, T... vars) {
 		value(var, vars);
 	}
 
 	/**
-	 * @param name name of this binding
-	 * @param var first parameter
-	 * @param vars rest of the parameter if exists
+	 * @param name
+	 *            name of this binding
+	 * @param var
+	 *            first parameter
+	 * @param vars
+	 *            rest of the parameter if exists
 	 */
+	@SafeVarargs
 	public <T> SQLBindNode(String name, T var, T... vars) {
 		name(name);
 		value(var, vars);
@@ -74,7 +81,8 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 
 	/**
 	 * 
-	 * @param it target nodes iterator 
+	 * @param it
+	 *            target nodes iterator
 	 */
 	public <T> SQLBindNode(Iterable<T> it) {
 		value(it);
@@ -133,6 +141,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	 * 
 	 * @param vars
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> SQLBind value(T var, T... vars) {
 		if (vars.length == 0) {
 			this.value = var;
@@ -251,7 +260,8 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	public SQLBindNode exclude(boolean exclude) {
 		super.exclude(exclude);
 		if (this.parent() != null && (!(this.parent() instanceof SQL) && this.parent() instanceof StreeGroup)) {
-			StreeIterator<SQLBindNode> walker = new StreeIterator<SQLBindNode>(parent(), StreeNodeMatcher.of(SQLBindNode.class, false));
+			StreeIterator<SQLBindNode> walker = new StreeIterator<SQLBindNode>(parent(),
+					StreeNodeMatcher.of(SQLBindNode.class, false));
 			if (!walker.hasNext()) {
 				this.parent().exclude(exclude);
 			}
@@ -279,8 +289,8 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 			if (checkNull()) {
 				this.exclude(true);
 			}
-		}else if(this.exclude){
-			this.exclude(false);
+		} else if (this.exclude) {
+			this.exclude(true);
 		}
 		return this;
 	}
@@ -320,8 +330,8 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 
 		if (buffer.length() == 0 || !Character.isWhitespace(buffer.charAt(buffer.length() - 1))) {
 			buffer.append(" ");
-		} 
-		
+		}
+
 		Iterable<?> ita = null;
 		if (isArray) {
 			ita = Arrays.asList((Object[]) targetValue);
@@ -333,13 +343,13 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 		}
 
 		Iterator<?> it = ita.iterator();
-		
+
 		buffer.append("(");
 		if (!it.hasNext()) {
 			buffer.append("null").append(seperator);
 		} else {
 			while (it.hasNext()) {
-				Object next = it.next();
+				it.next();
 				buffer.append("?").append(seperator);
 			}
 		}
@@ -380,7 +390,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	public Object getDefaultValue() {
 		return defaultValue;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -410,7 +420,8 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 			}
 
 		}
-		return "SQLBind [name=" + name + ", value=" + val + ", default:" + defaultValue + ", optional=" + optional + ", exlude=" + exclude + "]";
+		return "SQLBind [name=" + name + ", value=" + val + ", default:" + defaultValue + ", optional=" + optional
+				+ ", exlude=" + exclude + "]";
 	}
 
 }

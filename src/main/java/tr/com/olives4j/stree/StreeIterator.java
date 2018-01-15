@@ -115,8 +115,8 @@ public final class StreeIterator<T extends StreeNode> implements Iterator<T> {
 	}
 
 	/**
-	 * Represents an operation that accepts a single input argument and returns
-	 * no result.
+	 * Represents an operation that accepts a single input argument and returns no
+	 * result.
 	 * 
 	 * @param <T>
 	 */

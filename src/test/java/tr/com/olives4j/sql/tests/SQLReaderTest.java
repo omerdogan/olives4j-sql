@@ -58,14 +58,14 @@ public class SQLReaderTest extends TestBase {
 	public void testParseSQLScript() throws Exception {
 		SQLCollection sqls = SQLReader.read(new FileReader("src/test/sql/test1-search-query.sql"));
 		SQL sql = sqls.get("search_customer");
-		
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
-		//sql.bindings().bind("store_id"	, null).optional(true);
-		sql.bindings().bind("active"	, true);
-		sql.bindings().bind("firstname"	, "a%");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		// sql.bindings().bind("store_id" , null).optional(true);
+		sql.bindings().bind("active", true);
+		sql.bindings().bind("firstname", "a%");
 		sql.bindings().bind("start_date", sdf.parse("2006-02-14"));
-		sql.bindings().bind("end_date"	, sdf.parse("2006-02-16"));
-		
+		sql.bindings().bind("end_date", sdf.parse("2006-02-16"));
+
 		String query = sql.toString();
 		Iterator<SQLBindNode> bindings = sql.bindings().iterator();
 		List<SQLBindNode> list = toList(bindings);

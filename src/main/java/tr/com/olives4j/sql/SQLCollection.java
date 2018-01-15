@@ -88,7 +88,8 @@ public class SQLCollection implements Collection<SQL>, Cloneable {
 			}
 			SQL old = map.put(name, sql);
 			if (old != null) {
-				throw new RuntimeException("Could not convert sql collection to map, Dublicate keys found! Key:" + name);
+				throw new RuntimeException(
+						"Could not convert sql collection to map, Dublicate keys found! Key:" + name);
 			}
 		}
 		return map;

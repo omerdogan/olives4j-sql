@@ -18,7 +18,6 @@ targetCompatibility = 1.6
 
 buildscript {
 	repositories { mavenCentral() }
-	dependencies { classpath 'org.hibernate:hibernate-gradle-plugin:4.3.6.Final' }
 }
 
 // In this section you declare where to find the dependencies of your project

@@ -18,6 +18,11 @@ package tr.com.olives4j.sql.tests;
 
 import static tr.com.olives4j.sql.SQL.$;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -66,7 +71,28 @@ public class SQLBuilderTests extends TestBase {
 		Assert.assertEquals(countChar(sql.toString(), '?'), 4);
 		Assert.assertEquals(sql.bindings().size(), 1);
 
-		checkBind(sql, 0, numofValues = 4, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,value=Arrays.asList(1,2,3,4));
+		checkBind(sql, 0, numofValues = 4, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, value = Arrays.asList(1, 2, 3, 4));
+	}
+
+	/**
+	 * @throws SQLException
+	 * 
+	 */
+	@Test
+	public void testBindingNodePreparedStatement() throws SQLException {
+		SQL sql = SQL.of("select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME in ",
+				$("USERS", "ROLES", "SESSIONS"));
+		debugQuery(sql, 1);
+
+		Connection connection = DriverManager.getConnection("jdbc:h2:mem:./test;MV_STORE=FALSE and ;MVCC=FALSE", "sa", "");
+		PreparedStatement pstmt = connection.prepareStatement(sql.toString());
+		sql.bindings().apply(pstmt);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			logger.debug(rs.getString("TABLE_NAME") + " - " + rs.getString("LAST_MODIFICATION"));
+		}
+		
 	}
 
 	/**
@@ -80,7 +106,8 @@ public class SQLBuilderTests extends TestBase {
 		Assert.assertEquals(countChar(sql.toString(), '?'), 0);
 		Assert.assertEquals(sql.bindings().size(), 1);
 
-		checkBind(sql, 0, numofValues = 1, optional = true, excluded = true, excludedClauseIndex = 1, defaultValue = null,value=null);
+		checkBind(sql, 0, numofValues = 1, optional = true, excluded = true, excludedClauseIndex = 1,
+				defaultValue = null, value = null);
 
 	}
 
@@ -89,14 +116,16 @@ public class SQLBuilderTests extends TestBase {
 	 */
 	@Test
 	public void testBindingNodeOptionalWithDefault() {
-		SQL sql = SQL.of("select * from customer where 1=1 and customer_id in :bindCustIds and target_customer_id in :bindCustIds");
+		SQL sql = SQL.of(
+				"select * from customer where 1=1 and customer_id in :bindCustIds and target_customer_id in :bindCustIds");
 		sql.bindings().bind("bindCustIds", null).optional().defaultValue(Arrays.asList(1, 2, 3));
 		debugQuery(sql, 1);
 
 		Assert.assertEquals(countChar(sql.toString(), '?'), 6);
 		Assert.assertEquals(sql.bindings().size(), 2);
 
-		checkBind(sql, 0, numofValues = 3, optional = true, excluded = false, excludedClauseIndex = null, defaultValue = Arrays.asList(1, 2, 3),value=null);
+		checkBind(sql, 0, numofValues = 3, optional = true, excluded = false, excludedClauseIndex = null,
+				defaultValue = Arrays.asList(1, 2, 3), value = null);
 	}
 
 	/**
@@ -109,15 +138,18 @@ public class SQLBuilderTests extends TestBase {
 
 		Assert.assertEquals(countChar(sql.toString(), '?'), 4);
 		Assert.assertEquals(sql.bindings().size(), 1);
-		checkBind(sql, 0, numofValues = 4, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,Arrays.asList(1,2,3,4));
+		checkBind(sql, 0, numofValues = 4, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, Arrays.asList(1, 2, 3, 4));
 
 		sql.bindings().bind(0, null).optional();
 		debugQuery(sql, 2);
-		checkBind(sql, 0, numofValues = 1, optional = true, excluded = true, excludedClauseIndex = 1, defaultValue = null,value=null);
+		checkBind(sql, 0, numofValues = 1, optional = true, excluded = true, excludedClauseIndex = 1,
+				defaultValue = null, value = null);
 
 		sql.bindings().get(0).defaultValue(1);
 		debugQuery(sql, 3);
-		checkBind(sql, 0, numofValues = 1, optional = true, excluded = false, excludedClauseIndex = null, defaultValue = 1,value=1);
+		checkBind(sql, 0, numofValues = 1, optional = true, excluded = false, excludedClauseIndex = null,
+				defaultValue = 1, value = 1);
 	}
 
 	/**
@@ -141,11 +173,16 @@ public class SQLBuilderTests extends TestBase {
 		bindings.bind("enddate", sdf.parse("2006-02-16"));
 
 		debugQuery(sql, 1);
-		checkBind(sql, "store_id", numofValues = 1, optional = true, excluded = true, excludedClauseIndex = null, defaultValue = null,null);
-		checkBind(sql, "active", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,true);
-		checkBind(sql, "firstname", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,"a%");
-		checkBind(sql, "startdate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,sdf.parse("2006-02-14"));
-		checkBind(sql, "enddate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,sdf.parse("2006-02-16"));
+		checkBind(sql, "store_id", numofValues = 1, optional = true, excluded = true, excludedClauseIndex = null,
+				defaultValue = null, null);
+		checkBind(sql, "active", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, true);
+		checkBind(sql, "firstname", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, "a%");
+		checkBind(sql, "startdate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, sdf.parse("2006-02-14"));
+		checkBind(sql, "enddate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, sdf.parse("2006-02-16"));
 
 	}
 
@@ -181,12 +218,17 @@ public class SQLBuilderTests extends TestBase {
 
 		sql.bindings().map(foo, SQLBind.BEANMAPPER);
 		debugQuery(sql, 1);
-		
-		checkBind(sql, "store_id", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,value=foo.store_id);
-		checkBind(sql, "active", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,value=foo.active);
-		checkBind(sql, "first_name", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,foo.first_name);
-		checkBind(sql, "startdate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,foo.startdate);
-		checkBind(sql, "enddate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null, defaultValue = null,foo.enddate);
+
+		checkBind(sql, "store_id", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, value = foo.store_id);
+		checkBind(sql, "active", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, value = foo.active);
+		checkBind(sql, "first_name", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, foo.first_name);
+		checkBind(sql, "startdate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, foo.startdate);
+		checkBind(sql, "enddate", numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
+				defaultValue = null, foo.enddate);
 
 	}
 
@@ -235,20 +277,13 @@ public class SQLBuilderTests extends TestBase {
 		SQL sql = new SQL("sakila-find-overdue-dvds");
 		// @formatter:off
 		StreeMark markCustomer = StreeMark.create("customer");
-		sql.append("SELECT ",
-				"CONCAT(customer.last_name,', ',customer.first_name) AS customer,",
-				"address.phone,", 
-				"film.title", 
-				"FROM rental",
-				markCustomer,
-				"INNER JOIN customer ON (rental.customer_id = customer.customer_id and customer.create_date>:createdate)", 
+		sql.append("SELECT ", "CONCAT(customer.last_name,', ',customer.first_name) AS customer,", "address.phone,",
+				"film.title", "FROM rental", markCustomer,
+				"INNER JOIN customer ON (rental.customer_id = customer.customer_id and customer.create_date>:createdate)",
 				"INNER JOIN address ON customer.address_id = address.address_id",
-				"INNER JOIN inventory ON rental.inventory_id = inventory.inventory_id", 
-				"INNER JOIN film ON inventory.film_id = film.film_id",
-				"WHERE 1=1",
-				markCustomer,
-				"and customer.id in :customerId",
-				"and rental.return_date IS NULL", 
+				"INNER JOIN inventory ON rental.inventory_id = inventory.inventory_id",
+				"INNER JOIN film ON inventory.film_id = film.film_id", "WHERE 1=1", markCustomer,
+				"and customer.id in :customerId", "and rental.return_date IS NULL",
 				"and rental_date +INTERVAL film.rental_duration DAY< SYSDATE()");
 		// @formatter:on
 

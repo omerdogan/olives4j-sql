@@ -32,11 +32,6 @@ public class StreeGroup extends StreeNode {
 	protected List<StreeNode> nodes;
 
 	/**
-	 * Flag indicates if reconstruction of context need
-	 */
-	protected boolean modified = false;
-
-	/**
 	 * 
 	 */
 	public StreeGroup() {
@@ -50,6 +45,24 @@ public class StreeGroup extends StreeNode {
 	public <T extends StreeNode> StreeGroup(List<T> nodes) {
 		this();
 		append(nodes.toArray());
+	}
+
+	/**
+	 * 
+	 * @return a new Stree instance with empty content
+	 */
+	public static Stree of() {
+		return new Stree();
+	}
+
+	/**
+	 * 
+	 * @return a new Stree instance with the given content
+	 */
+	public static Stree of(Object... exprs) {
+		Stree tree = new Stree();
+		tree.append(exprs);
+		return tree;
 	}
 
 	/**
@@ -71,14 +84,14 @@ public class StreeGroup extends StreeNode {
 	 */
 	public StreeGroup append(Iterable<?> nodes) {
 		Iterator<?> iterator = nodes.iterator();
-		while(iterator.hasNext()) {
+		while (iterator.hasNext()) {
 			StreeNode expr = parse(iterator.next());
 			append(expr);
 		}
 
 		return this;
 	}
-	
+
 	/**
 	 * 
 	 * @param node
@@ -86,7 +99,6 @@ public class StreeGroup extends StreeNode {
 	public StreeGroup append(StreeNode node) {
 		this.nodes.add(node);
 		node.parent(this);
-		this.modified = true;
 		return this;
 	}
 
@@ -125,10 +137,10 @@ public class StreeGroup extends StreeNode {
 	 */
 	@Override
 	public StreeNode merge(StringBuilder buffer) {
-		super.merge(buffer);
 		if (this.isExclude()) {
 			return this;
 		}
+		super.merge(buffer);
 		for (StreeNode clause : nodes) {
 			clause.merge(buffer);
 		}
@@ -162,28 +174,23 @@ public class StreeGroup extends StreeNode {
 		return new StreeIterator<T>(this, selector);
 	}
 
+	// SETTTER/GETTER ///////////////////////////////////////////////
+
+	/**
+	 * @param sql
+	 *            the sql to set
+	 */
+	public void setContent(String sql) {
+		this.nodes = new ArrayList<StreeNode>();
+		append(sql);
+	}
+
 	/**
 	 * 
 	 * @return
 	 */
 	public List<StreeNode> getNodes() {
 		return nodes;
-	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	public boolean isModified() {
-		return modified;
-	}
-
-	/**
-	 * 
-	 * @param modified
-	 */
-	public void setModified(boolean modified) {
-		this.modified = modified;
 	}
 
 	/**
@@ -199,10 +206,10 @@ public class StreeGroup extends StreeNode {
 	 */
 	public StreeNode clone() {
 		StreeGroup clause = new StreeGroup();
-		for(int i=0;i<this.nodes.size();i++){
+		for (int i = 0; i < this.nodes.size(); i++) {
 			clause.append(nodes.get(i).clone());
 		}
-		
+
 		return clause;
 	}
 

@@ -33,42 +33,48 @@ public interface SQLBind {
 
 	/**
 	 * 
-	 * @param name set the bind name
+	 * @param name
+	 *            set the bind name
 	 * @return
 	 */
 	SQLBind name(String name);
 
 	/**
 	 * 
-	 * @param jdbcType target jdbc type 
+	 * @param jdbcType
+	 *            target jdbc type
 	 * @return
 	 */
 	SQLBind jdbcType(Integer jdbcType);
-	
+
 	/**
 	 * 
-	 * @param inline setter if this binding is refer to an inline parameter or binding
+	 * @param inline
+	 *            setter if this binding is refer to an inline parameter or binding
 	 * @return
 	 */
 	SQLBind inline(boolean inline);
 
 	/**
 	 * 
-	 * @param seperator holds the target seperator characters
+	 * @param seperator
+	 *            holds the target seperator characters
 	 * @return
 	 */
 	SQLBind seperator(String seperator);
 
 	/**
 	 * 
-	 * @param defaultValue holds the value assigned by default if no value provided
+	 * @param defaultValue
+	 *            holds the value assigned by default if no value provided
 	 * @return
 	 */
 	public SQLBind defaultValue(Object defaultValue);
 
 	/**
 	 * 
-	 * @param exclude flag indicates if this node is excluded from final output or not
+	 * @param exclude
+	 *            flag indicates if this node is excluded from final output or not
 	 * @return
 	 */
 	public SQLBind exclude(boolean exclude);
@@ -84,14 +90,14 @@ public interface SQLBind {
 	 * @return if this binding is required
 	 */
 	SQLBind required();
-	
+
 	/**
 	 * @return name of the binding
 	 */
 	public String getName();
 
 	/**
-	 * @return  if this node is excluded from final output or not   
+	 * @return if this node is excluded from final output or not
 	 */
 	public boolean isExcluded();
 
@@ -99,12 +105,12 @@ public interface SQLBind {
 	 * @return if this is an optional node
 	 */
 	public boolean isOptional();
-	
+
 	/**
 	 * @return if this is inline paramter
 	 */
 	public boolean isInline();
-	
+
 	/**
 	 * @return default value used if no user defined value provided
 	 */
@@ -116,19 +122,19 @@ public interface SQLBind {
 	public Object value();
 
 	/**
-	 * @return extract the value as collection 
+	 * @return extract the value as collection
 	 */
 	public Collection<Object> extract();
-	
+
 	/**
-	 * @return extract the value into given collection 
+	 * @return extract the value into given collection
 	 */
 	public Collection<Object> extract(Collection<Object> c);
 
 	// Inner classes /////////////////////////////////////////
 
 	/**
-	 * Define an inteface for mapping named parameter values 
+	 * Define an inteface for mapping named parameter values
 	 */
 	public interface Mapper {
 		Object map(SQLBindNode binding, Object bean);
@@ -293,7 +299,7 @@ public interface SQLBind {
 		public boolean isInline() {
 			return set.get(0).isInline();
 		}
-		
+
 		@Override
 		public Object getDefaultValue() {
 			return set.get(0).getDefaultValue();
@@ -308,7 +314,7 @@ public interface SQLBind {
 		public Collection<Object> extract() {
 			return extract(new ArrayList<Object>());
 		}
-		
+
 		@Override
 		public Collection<Object> extract(Collection<Object> c) {
 			return set.get(0).extract(c);
