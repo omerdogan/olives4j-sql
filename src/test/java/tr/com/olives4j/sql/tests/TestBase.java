@@ -40,6 +40,7 @@ import tr.com.olives4j.stree.StreeGroup;
 import tr.com.olives4j.stree.StreeIterator;
 import tr.com.olives4j.stree.StreeNode;
 
+@SuppressWarnings("rawtypes")
 public class TestBase {
 	Logger logger = Logger.getLogger(TestBase.class);
 
@@ -65,6 +66,11 @@ public class TestBase {
 		buffer.append("\n\n" + num + ".1 query :\n" + sql.toString());
 		buffer.append("\n\n" + num + ".2 formatted :\n" + sql.format());
 		buffer.append("\n\n" + num + ".3 Bindings	:\n" + lines(sql.bindings()));
+		buffer.append("\n");
+		List<StreeNode> nodes = sql.getNodes();
+		for (StreeNode streeNode : nodes) {
+			buffer.append(streeNode).append("\n");
+		}
 		logger.debug(buffer);
 	}
 
@@ -82,14 +88,13 @@ public class TestBase {
 
 	public void checkBind(SQL sql, SQLBind bind, int numOfValues, boolean optional, boolean excluded,
 			Integer excludedClauseIndex, Object defaultValue, Object value) {
-		sql.process();
-		Assert.assertEquals(bind.extract().size(), numOfValues);
-		Assert.assertEquals(bind.isOptional(), optional);
-		Assert.assertEquals(bind.getDefaultValue(), defaultValue);
-		Assert.assertEquals(bind.isExcluded(), excluded);
+		Assert.assertEquals("Size not match",bind.extract().size(), numOfValues);
+		Assert.assertEquals("Optional not match",bind.isOptional(), optional);
+		Assert.assertEquals("Default not match",bind.getDefaultValue(), defaultValue);
+		Assert.assertEquals("Exclude not match",bind.isExcluded(), excluded);
 
 		if (excludedClauseIndex != null) {
-			Assert.assertTrue(sql.getNodes().get(excludedClauseIndex).isExclude());
+			Assert.assertTrue("Expect node "+excludedClauseIndex+" is excluded but not excluded",sql.getNodes().get(excludedClauseIndex).isExclude());
 		}
 	}
 
@@ -144,7 +149,6 @@ public class TestBase {
 		return counter;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public static int size(Iterator it) {
 		int counter = 0;
 		while (it.hasNext()) {
@@ -187,10 +191,10 @@ public class TestBase {
 		return buffer.toString();
 	}
 
-	@SuppressWarnings("unchecked")
 	private static final List<Class<? extends Object>> LEAVES = Arrays.asList(Boolean.class, Character.class,
 			Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Void.class, String.class);
 
+	@SuppressWarnings("serial")
 	private static Set<Class<?>> wrapperTypes = new HashSet<Class<?>>() {
 		{
 			add(Boolean.class);

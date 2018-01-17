@@ -66,6 +66,22 @@ public class StreeGroup extends StreeNode {
 	}
 
 	/**
+	 * 
+	 * @return if this node excluded
+	 */
+	public boolean isExclude() {
+		Iterator<StreeNode> iterator = this.nodes.iterator();
+		while (iterator.hasNext()) {
+			StreeNode next = iterator.next();
+			if (next.isExclude()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * append given
 	 * 
 	 */
@@ -137,22 +153,17 @@ public class StreeGroup extends StreeNode {
 	 */
 	@Override
 	public StreeNode merge(StringBuilder buffer) {
-		if (this.isExclude()) {
-			return this;
+		for (StreeNode clause : nodes) {
+			if (clause.isExclude()) {
+				return this;
+			}
 		}
+
 		super.merge(buffer);
 		for (StreeNode clause : nodes) {
 			clause.merge(buffer);
 		}
 
-		return this;
-	}
-
-	@Override
-	public StreeNode process() {
-		for (StreeNode node : this.nodes) {
-			node.process();
-		}
 		return this;
 	}
 
@@ -220,7 +231,7 @@ public class StreeGroup extends StreeNode {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("StreeGroup[");
 		for (int i = 0; i < nodes.size(); i++) {
-			buffer.append(nodes.get(i).toString()).append(",");
+			buffer.append(nodes.get(i).toString()).append(",\n");
 		}
 		buffer.append("]");
 		return buffer.toString();

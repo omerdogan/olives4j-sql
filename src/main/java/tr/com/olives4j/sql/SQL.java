@@ -151,9 +151,13 @@ public class SQL extends Stree {
 			}
 		} else if (node instanceof SQLBindNode) {
 			this.bindings.add((SQLBindNode) node);
+			StreeNode lastNode = this.nodes.remove(this.nodes.size() - 1);
+			node = new StreeGroup().append(lastNode, node);
+			
 		}
 		return super.append(node);
 	}
+ 
 
 	/**
 	 * 

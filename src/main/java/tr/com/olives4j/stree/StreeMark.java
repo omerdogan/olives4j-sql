@@ -56,7 +56,6 @@ public final class StreeMark extends StreeNode {
 	/**
 	 * 
 	 */
-	@Override
 	public StreeMark process() {
 		if (!this.exclude) {
 			return this;

@@ -87,6 +87,12 @@ public interface SQLBind {
 
 	/**
 	 * 
+	 * @return if this binding is optional
+	 */
+	SQLBind optional(Object defaultValue);
+
+	/**
+	 * 
 	 * @return if this binding is required
 	 */
 	SQLBind required();
@@ -221,6 +227,17 @@ public interface SQLBind {
 		public SQLBind optional() {
 			for (SQLBind sqlBind : set) {
 				sqlBind.optional();
+			}
+			return this;
+		}
+
+		/**
+		 * 
+		 */
+		@Override
+		public SQLBind optional(Object defaultValue) {
+			for (SQLBind sqlBind : set) {
+				sqlBind.optional(defaultValue);
 			}
 			return this;
 		}

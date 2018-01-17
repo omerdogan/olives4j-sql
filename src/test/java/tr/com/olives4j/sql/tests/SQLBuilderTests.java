@@ -38,7 +38,6 @@ import org.junit.Test;
 
 import tr.com.olives4j.sql.SQL;
 import tr.com.olives4j.sql.SQLBind;
-import tr.com.olives4j.sql.SQLBindNode;
 import tr.com.olives4j.sql.SQLBindings;
 import tr.com.olives4j.stree.StreeMark;
 import tr.com.olives4j.stree.StreeNode;
@@ -51,9 +50,9 @@ import tr.com.olives4j.stree.StreeNode;
 public class SQLBuilderTests extends TestBase {
 	static Logger logger = Logger.getLogger(SQLBuilderTests.class);
 	static {
-		String pattern1 = "%d %r [%t] %-5p %c %x - %m%n ";
-		String pattern2 = "%m%n ";
-		BasicConfigurator.configure(new ConsoleAppender(new PatternLayout(pattern2)));
+		String pattern = "%d %r [%t] %-5p %c %x - %m%n ";
+		pattern = "%m%n ";
+		BasicConfigurator.configure(new ConsoleAppender(new PatternLayout(pattern)));
 	}
 
 	boolean optional, excluded;
@@ -133,7 +132,7 @@ public class SQLBuilderTests extends TestBase {
 	 */
 	@Test
 	public void testBindingNodeOverride() {
-		SQL sql = SQL.of("select * from customer where 1=1", " and customer_id in ", $(1, 2, 3, 4));
+		SQL sql = SQL.of("select * from customer where 1=1","  and customer_id in ", $(1, 2, 3, 4));
 		debugQuery(sql, 1);
 
 		Assert.assertEquals(countChar(sql.toString(), '?'), 4);
@@ -146,9 +145,9 @@ public class SQLBuilderTests extends TestBase {
 		checkBind(sql, 0, numofValues = 1, optional = true, excluded = true, excludedClauseIndex = 1,
 				defaultValue = null, value = null);
 
-		sql.bindings().get(0).defaultValue(1);
+		sql.bindings().get(0).defaultValue(1).required();
 		debugQuery(sql, 3);
-		checkBind(sql, 0, numofValues = 1, optional = true, excluded = false, excludedClauseIndex = null,
+		checkBind(sql, 0, numofValues = 1, optional = false, excluded = false, excludedClauseIndex = null,
 				defaultValue = 1, value = 1);
 	}
 
@@ -160,7 +159,7 @@ public class SQLBuilderTests extends TestBase {
 	public void testBindingComplexWithNamedBinds() throws ParseException {
 		SQL sql = SQL.of("select * from customer where 1=1", //
 				" and store_id 	= :store_id", //
-				" and first_name like :firstname", //
+				" and first_name like :firstname ",//
 				" and active    = :active ", //
 				" and create_date between :startdate and :enddate");
 
@@ -256,13 +255,9 @@ public class SQLBuilderTests extends TestBase {
 
 		clone2.bindings().bind("active", null).optional();
 
-		Iterator<SQLBindNode> bindings1 = clone1.bindings().iterator();
-		Iterator<SQLBindNode> bindings2 = clone2.bindings().iterator();
-
 		logger.debug(clone1.format());
 		logger.debug(clone2.format());
 
-		StringBuilder buffer = new StringBuilder();
 		logger.debug(toStringRecursive(clone1, 0));
 		logger.debug("=========================");
 		logger.debug(toStringRecursive(clone2, 0));

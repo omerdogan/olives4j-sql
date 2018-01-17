@@ -207,12 +207,28 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see tr.com.olives4j.sql.SQLBind#optional(Object defaultValue)
+	 */
+	@Override
+	public SQLBindNode optional(Object defaultValue) {
+		this.optional = true;
+		return this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see tr.com.olives4j.sql.SQLBind#required()
 	 */
 	@Override
 	public SQLBindNode required() {
 		this.optional = false;
 		return this;
+	}
+
+	@Override
+	public boolean isExclude() {
+		return exclude || (this.optional && this.defaultValue == null && checkNull());
 	}
 
 	/*
@@ -372,7 +388,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	 */
 	@Override
 	public boolean isExcluded() {
-		return exclude;
+		return exclude || (this.optional && this.defaultValue == null && checkNull());
 	}
 
 	/**

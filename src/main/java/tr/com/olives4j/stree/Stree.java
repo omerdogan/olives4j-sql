@@ -112,6 +112,19 @@ public class Stree extends StreeGroup {
 		return iterator;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 */
+	@Override
+	public StreeNode merge(StringBuilder buffer) {
+		for (StreeNode clause : nodes) {
+			clause.merge(buffer);
+		}
+
+		return this;
+	}
+
 	// Object implementation //////////////////////////////
 	/**
 	 * 
@@ -119,7 +132,6 @@ public class Stree extends StreeGroup {
 	@Override
 	public String toString() {
 		StringBuilder buffer = new StringBuilder();
-		process();
 		merge(buffer);
 		return buffer.toString();
 	}

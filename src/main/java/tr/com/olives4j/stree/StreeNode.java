@@ -52,14 +52,6 @@ public abstract class StreeNode {
 
 	/**
 	 * 
-	 * @return
-	 */
-	public StreeNode process() {
-		return this;
-	}
-
-	/**
-	 * 
 	 * @param buffer
 	 * @param sq
 	 * @return
