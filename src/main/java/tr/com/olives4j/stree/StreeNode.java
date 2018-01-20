@@ -56,7 +56,7 @@ public abstract class StreeNode {
 	 * @param sq
 	 * @return
 	 */
-	public StreeNode merge(StringBuilder buffer) {
+	protected StreeNode merge(StringBuilder buffer) {
 		return this;
 	}
 

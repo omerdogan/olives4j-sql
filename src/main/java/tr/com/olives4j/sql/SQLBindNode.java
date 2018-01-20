@@ -332,7 +332,7 @@ public class SQLBindNode extends StreeNode implements SQLBind {
 	 * 
 	 */
 	@Override
-	public StreeNode merge(StringBuilder buffer) {
+	protected StreeNode merge(StringBuilder buffer) {
 		if (this.isExclude()) {
 			return this;
 		}

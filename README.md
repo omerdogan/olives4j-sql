@@ -55,6 +55,17 @@ Observations from the sample code;
 * SQL expressions including optional bindings removed from the final query if the provided values are null 
 * SQL #format() produce formatted sql string which also includes binding parameter values placed relatively near to placeholders. It make sql debugging much easier
 
+and using the SQL in jdbc in plain like the following example; 
+
+```java
+		Connection connection = DriverManager.getConnection("jdbc:h2:mem:./test;MV_STORE=FALSE and ;MVCC=FALSE", "sa", "");
+		PreparedStatement pstmt = connection.prepareStatement(sql.toString());
+		sql.bindings().apply(pstmt);
+		ResultSet rs = pstmt.executeQuery();
+		while (rs.next()) {
+			logger.debug(rs.getString("TABLE_NAME") + " - " + rs.getString("LAST_MODIFICATION"));
+		}
+```
 
 Usage
 -----
@@ -250,7 +261,7 @@ Below contains examples to compare olives4j-sql with a few well known libraries 
 
 ##### Sample User Input
 ```java
-
+	 Long storeId=1L;
     String firstName="O";
     String lastName="";
     Boolean active=true;
@@ -264,10 +275,10 @@ Below contains examples to compare olives4j-sql with a few well known libraries 
 
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	SQL sql = SQL.of("select * from customer where 1=1", //
-				" and store_id =:store_id ", //
-				" and first_name like ", $("a%"), //
-				" and active = ", $(true), //
-				" and create_date between", $(sdf.parse("2006-02-14")), "and", $(sdf.parse("2006-02-16")));
+				" and store_id",$(storeId), //
+				" and first_name like", $(lastName), //
+				" and active = ", $(active), //
+				" and create_date between", $(sdf.parse(startDate)), "and", $(sdf.parse(endDate)));
 	
 	Connection conn=getConnection();
 	PreparedStatement pstmto = conn.prepareStatement(sql.toString());
